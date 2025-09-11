@@ -1,0 +1,179 @@
+# AdultingOS Project Documentation
+
+## Project Overview
+AdultingOS is a comprehensive application designed to help users navigate the challenges of adult life. It features a Python/FastAPI backend and a React frontend, with functionality for task management, user profiles, and a conversational interface for gathering user information.
+
+## Project Structure
+The project follows a modern, clean architecture with clear separation between frontend and backend components:
+
+### Backend (Python/FastAPI)
+- `/backend`: Contains the Python/FastAPI backend code
+  - `/src`: Source code modules
+    - `__init__.py`: Package initialization
+    - `config.py`: Application configuration and environment variables
+    - `models.py`: Data models using Pydantic
+    - `tasks.py`: Task management API endpoints
+    - `utils.py`: Utility functions
+  - `/data`: Directory for data storage
+  - `/tests`: Unit and integration tests
+    - `__init__.py`: Test package initialization
+    - `test_utils.py`: Tests for utility functions
+  - `main.py`: Main application entry point
+  - `requirements.txt`: Python dependencies
+  - `.env.example`: Example environment variables
+
+### Frontend (React)
+- `/frontend`: Contains the React frontend application
+  - `/src`: Source code components
+    - `App.js`: Main React application component
+    - `components/`: Reusable UI components
+      - `Chatbot.js`: Chatbot interface component
+  - `/public`: Static assets
+
+## Key Features
+
+### Task Management System
+The application includes a RESTful API for managing tasks with endpoints for:
+- Creating new tasks
+- Retrieving all tasks
+- Retrieving specific tasks by ID
+- Updating tasks
+- Deleting tasks
+
+Each task has properties like title, description, category, due date, priority, and completion status.
+
+### User Profile System
+The application captures user profile information through a conversational interface, asking questions about:
+- Student status
+- Income level
+- Housing situation (rent or own)
+- Marital status
+
+### Conversational Interface
+The application features a chatbot-like interface that guides users through a series of questions to build their profile.
+
+## Technical Implementation
+
+### Backend
+The backend is built with FastAPI, providing a high-performance, easy-to-use framework for building APIs with Python. Key components include:
+
+1. **API Endpoints**:
+   - RESTful endpoints for task management
+   - Endpoint for the chat interface
+
+2. **Data Models**:
+   - `Task`: Model for representing tasks with fields like title, description, priority, etc.
+   - `User`: Model for representing user profiles
+   - `ChatMessage`: Model for representing chat messages
+
+3. **Utility Functions**:
+   - `format_response`: Standardizes API responses
+   - `validate_input`: Validates incoming data against required fields
+
+4. **Configuration**:
+   - Environment-based configuration
+   - Support for different environments (development, production)
+
+### Frontend
+The frontend is built with React, providing a modern, component-based UI framework. Key components include:
+
+1. **Main Application**:
+   - Core application structure
+   - Routing
+
+2. **Components**:
+   - `Chatbot`: Interface for conversational interactions
+
+## Development Setup
+
+### Prerequisites
+- Python 3.11+
+- Node.js and npm
+- Git
+
+### Backend Setup
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. Run the server:
+   ```
+   uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+   ```
+
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm start
+   ```
+
+The application should now be accessible at `http://localhost:3000`.
+
+## VS Code Integration
+The project includes VS Code tasks for easy development:
+
+- **Run Backend**: Starts the FastAPI server with hot reloading
+- **Run Frontend**: Starts the React development server
+- **Run All Tests**: Runs all backend tests
+- **Run All**: Starts both backend and frontend servers
+
+## Development Best Practices
+
+### Code Structure
+- Clear separation of concerns
+- Modular design
+- Well-documented code with docstrings
+- Type hints and validation with Pydantic
+
+### Testing
+- Unit tests for backend functionality
+- Test utilities for common testing tasks
+
+### Environment Management
+- Environment variables for configuration
+- Example environment file
+- Virtual environment for Python
+
+### Version Control
+- .gitignore file for proper version control
+- Structured commits and branching
+
+## Future Enhancements
+Potential areas for future development include:
+
+1. **Database Integration**:
+   - Replace in-memory storage with a proper database
+   - Add data persistence
+
+2. **Authentication**:
+   - User authentication and authorization
+   - Secure API endpoints
+
+3. **Enhanced Features**:
+   - More sophisticated task management
+   - Financial planning tools
+   - Integration with external services
+
+4. **UI Improvements**:
+   - Enhanced mobile responsiveness
+   - Accessibility improvements
+   - Dark/light mode toggle
+
+## Conclusion
+AdultingOS provides a solid foundation for building a comprehensive application to help users navigate adult life. With its clean architecture, modern technology stack, and clear separation of concerns, it is well-positioned for future growth and enhancement.

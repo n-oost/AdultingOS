@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Backend",
+            "type": "shell",
+            "command": "cd backend && uvicorn main:app --host 127.0.0.1 --port 8001 --reload",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run Frontend",
+            "type": "shell",
+            "command": "cd frontend && npm start",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run All Tests",
+            "type": "shell",
+            "command": "cd backend && python -m pytest tests/",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run All",
+            "dependsOn": [
+                "Run Backend",
+                "Run Frontend"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

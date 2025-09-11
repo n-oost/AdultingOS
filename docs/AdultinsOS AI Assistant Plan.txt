@@ -1,0 +1,85 @@
+AdultingOS AI Assistant Plan
+
+Goal
+- Provide a reliable assistant for life admin (tasks, reminders, docs) with a clean API.
+- Start simple (chat + slash-commands), then iterate with tool calling, memory, and retrieval.
+
+Architecture
+- Backend: FastAPI with two paths:
+  1) Deterministic slash-commands (/task list|add|done)
+  2) Chat endpoint backed by a pluggable LLM client (OpenAI or local Ollama)
+- Config via environment variables for easy provider switching.
+- Storage: JSON file for tasks (starter). Replace with DB later.
+
+Why this approach
+- Deterministic commands guarantee correctness for core actions.
+- LLM chat is value-add for explanation and planning.
+- Pluggable client avoids lock-in and supports local dev without keys.
+
+Providers (as of late 2024)
+- OpenAI: gpt-4o-mini (balanced cost/quality), gpt-4o for higher quality.
+- Local: Ollama (e.g., llama3.1:8b) for private/offline prototyping.
+- Azure OpenAI can be added with the same interface (not included in v1).
+
+MVP scope
+- Chat with system prompt (no streaming yet).
+- Slash-commands for tasks:
+  - /task list
+  - /task add "Title" --desc "..." --cat general --due 2025-12-31 --priority 2 --tags a,b
+  - /task done <id>
+
+API
+- POST /assistant/chat
+  - body: { message, history?, mode? }
+  - returns: { reply }
+- GET /assistant/tasks is not required initially (use /task list in chat).
+
+Data
+- Tasks persisted in backend/data/tasks.json for simplicity (migrate later).
+
+Security & safety
+- Do not log secrets.
+- Rate-limit endpoints at ingress if exposed publicly.
+- Validate inputs; defensive defaults.
+- If handling PII, ensure encryption at rest when migrating to a DB.
+
+Next steps (Phase 2)
+1) Tool calling with the model
+   - Use function/tool calling to let the LLM invoke create_task/list_tasks/complete_task.
+   - Keep the same tool implementations; expose JSON schemas.
+
+2) Memory & persona
+   - Store short conversation summaries per user_id (SQLite or PostgreSQL).
+   - Add user preferences (tone, categories) from models.User.
+
+3) Retrieval-Augmented Generation (RAG)
+   - Index local docs (policies, checklists) with embeddings (OpenAI text-embedding-3-small or local).
+   - Vector store: FAISS/Chroma; expose /assistant/ingest and augment chat context.
+
+4) Streaming & UI
+   - Add SSE or WebSocket streaming for responsive UX.
+   - Frontend can display partial tokens.
+
+5) Observability & evals
+   - Add telemetry (OpenTelemetry) and prompt tests (Ragas or custom harness).
+   - Track latency, cost, and tool success rate.
+
+6) Migration to real DB
+   - Replace JSON with SQLite/Postgres.
+   - Add Alembic migrations, repositories, and services.
+
+Ready-to-run
+- 1) Copy backend/.env.example to backend/.env and set keys if using OpenAI.
+- 2) pip install -r backend/requirements.txt
+- 3) uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+- 4) Test with curl:
+     curl -X POST http://127.0.0.1:8001/assistant/chat ^
+          -H "Content-Type: application/json" ^
+          -d "{ \"message\": \"/task add \\\"Pay rent\\\" --due 2025-10-01 --priority 2 --cat finance\" }"
+     curl -X POST http://127.0.0.1:8001/assistant/chat ^
+          -H "Content-Type: application/json" ^
+          -d "{ \"message\": \"/task list\" }"
+- 5) Chat mode (requires LLM):
+     curl -X POST http://127.0.0.1:8001/assistant/chat ^
+          -H "Content-Type: application/json" ^
+          -d "{ \"message\": \"Help me plan renewing my car registration\" }"

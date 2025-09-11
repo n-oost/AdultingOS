@@ -1,0 +1,48 @@
+AdultingOS AI Assistant Plan
+
+Goal
+- Provide a reliable assistant for life admin (tasks, reminders, docs) with a clean API.
+- Start simple (chat + slash-commands), then iterate with tool calling, memory, and retrieval.
+
+Architecture
+- Backend: FastAPI with two paths:
+  1) Deterministic slash-commands (/task list|add|done)
+  2) Chat endpoint backed by a pluggable LLM client (OpenAI or local Ollama)
+- Config via environment variables for easy provider switching.
+- Storage: JSON file for tasks (starter). Replace with DB later.
+
+MVP scope
+- Chat with system prompt (no streaming yet).
+- Slash-commands for tasks:
+  - /task list
+  - /task add "Title" --desc "..." --cat general --due 2025-12-31 --priority 2 --tags a,b
+  - /task done <id>
+
+API
+- POST /assistant/chat
+  - body: { message, history?, mode? }
+  - returns: { reply }
+
+Providers
+- OpenAI: gpt-4o-mini (balanced cost/quality)
+- Local: Ollama (e.g., llama3.1:8b)
+
+Next steps (Phase 2)
+1) Tool calling with the model
+2) Memory & persona
+3) RAG with embeddings
+4) Streaming & UI
+5) Observability & evals
+6) Migrate to DB
+
+Run (Windows)
+1) Copy backend/.env.example to backend/.env; set MODEL_PROVIDER and keys.
+2) pip install -r backend/requirements.txt
+3) uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+4) Test:
+   curl -X POST http://127.0.0.1:8001/assistant/chat ^
+        -H "Content-Type: application/json" ^
+        -d "{ \"message\": \"/task add \\\"Pay rent\\\" --due 2025-10-01 --priority 2 --cat finance\" }"
+   curl -X POST http://127.0.0.1:8001/assistant/chat ^
+        -H "Content-Type: application/json" ^
+        -d "{ \"message\": \"/task list\" }"
