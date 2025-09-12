@@ -1,10 +1,12 @@
 """
 Main file for the AdultingOS backend.
+Configured for Vercel serverless deployment.
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
 
 # --- Data Models ---
 class ChatMessage(BaseModel):
@@ -16,6 +18,7 @@ app = FastAPI(
     title="AdultingOS API",
     description="API for the AdultingOS application.",
     version="0.1.0",
+    root_path="/api" if os.environ.get("VERCEL") else "",
 )
 
 # CORS (allow frontend during dev)
