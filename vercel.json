@@ -25,10 +25,5 @@
   ],
   "env": {
     "PYTHONPATH": "/var/task"
-  },
-  "functions": {
-    "backend/main.py": {
-      "includeFiles": "backend/**"
-    }
   }
 }
