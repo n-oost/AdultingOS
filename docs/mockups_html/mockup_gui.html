@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdultingOS Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-progress {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-sm mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden h-[800px] flex flex-col">
+        <!-- Header -->
+        <header class="bg-white p-4 border-b border-gray-200 flex justify-between items-center z-10">
+            <div class="flex items-center space-x-2">
+                <div class="bg-blue-600 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">AdultingOS</h1>
+            </div>
+            <div class="relative">
+                <img src="https://placehold.co/40x40/E2E8F0/4A5568?text=N" class="rounded-full" alt="User Avatar">
+                <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-white"></span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="flex-grow overflow-y-auto p-6 bg-gray-50">
+            <!-- Content will be dynamically injected here -->
+        </main>
+
+        <!-- Navigation -->
+        <nav class="bg-white border-t border-gray-200 p-2 flex justify-around">
+            <button onclick="navigate('dashboard')" class="nav-item p-3 rounded-xl flex flex-col items-center space-y-1 text-blue-600 bg-blue-50 w-20">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="text-xs font-medium">Home</span>
+            </button>
+            <button onclick="navigate('benefits')" class="nav-item p-3 rounded-xl flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 w-20">
+                <i data-lucide="gem"></i>
+                <span class="text-xs font-medium">Benefits</span>
+            </button>
+            <button onclick="navigate('documents')" class="nav-item p-3 rounded-xl flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 w-20">
+                <i data-lucide="file-text"></i>
+                <span class="text-xs font-medium">Docs</span>
+            </button>
+            <button onclick="navigate('chat')" class="nav-item p-3 rounded-xl flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 w-20">
+                <i data-lucide="message-circle"></i>
+                <span class="text-xs font-medium">Guidance</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        const mainContent = document.getElementById('main-content');
+
+        const templates = {
+            dashboard: `
+                <div class="space-y-6 animate-fade-in">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Hello, Noah!</h2>
+                        <p class="text-gray-500">Here's your financial overview.</p>
+                    </div>
+
+                    <!-- Benefit-to-Goal Planner -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-semibold text-gray-700">Goal: Emergency Fund</h3>
+                            <span class="text-sm font-medium text-blue-600">$750 / $2,000</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full animate-progress" style="width: 37.5%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Claiming your tax credit can add ~$500 to this goal!</p>
+                    </div>
+                    
+                    <!-- Proactive Eligibility Forecaster -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center space-x-3 mb-3">
+                             <div class="bg-green-100 text-green-700 p-2 rounded-lg">
+                                <i data-lucide="check-circle-2"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-700">Top Benefit Match</h3>
+                                <p class="text-sm text-gray-500">Canada Workers Benefit</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm">
+                                <span class="font-medium">Approval Chance:</span>
+                                <span class="text-green-600 font-bold">Very High</span>
+                            </div>
+                            <button onclick="navigate('benefits')" class="text-sm bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">View Details</button>
+                        </div>
+                    </div>
+
+                    <!-- Document Intelligence Hub -->
+                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center space-x-3 mb-3">
+                             <div class="bg-indigo-100 text-indigo-700 p-2 rounded-lg">
+                                <i data-lucide="file-scan"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-700">Document Hub</h3>
+                                <p class="text-sm text-gray-500">Keep your documents organized.</p>
+                            </div>
+                        </div>
+                        <button onclick="navigate('documents')" class="w-full text-center bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-600 transition-colors">Upload & Analyze</button>
+                    </div>
+                </div>
+            `,
+            benefits: `
+                <div class="space-y-4 animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Potential Benefits</h2>
+                    
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-semibold text-gray-800">Canada Workers Benefit (CWB)</h3>
+                        <p class="text-sm text-gray-500 mb-3">A refundable tax credit to help individuals and families who are working and earning a low income.</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-semibold">Likelihood: <span class="text-green-600">Very High</span></span>
+                             <button class="bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-full">Apply Now</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-semibold text-gray-800">GST/HST Credit</h3>
+                        <p class="text-sm text-gray-500 mb-3">A tax-free quarterly payment that helps individuals and families with low and modest incomes offset all or part of the GST or HST that they pay.</p>
+                         <div class="flex items-center justify-between text-sm">
+                            <span class="font-semibold">Likelihood: <span class="text-yellow-600">High</span></span>
+                             <button class="bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-full">View</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-semibold text-gray-800">Ontario Trillium Benefit (OTB)</h3>
+                        <p class="text-sm text-gray-500 mb-3">Combines the Ontario energy and property tax credit, the Northern Ontario energy credit, and the Ontario sales tax credit.</p>
+                         <div class="flex items-center justify-between text-sm">
+                            <span class="font-semibold">Likelihood: <span class="text-orange-600">Medium</span></span>
+                            <button class="bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-full">View</button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            documents: `
+                <div class="animate-fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">My Documents</h2>
+                        <button id="upload-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 hover:bg-blue-700">
+                            <i data-lucide="upload-cloud"></i>
+                            <span>Upload</span>
+                        </button>
+                    </div>
+                    <div id="doc-list" class="space-y-3">
+                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="file-text" class="text-blue-500"></i>
+                                <div>
+                                    <p class="font-medium text-gray-800">W-2_2024.pdf</p>
+                                    <p class="text-xs text-gray-500">Analyzed & ready for use</p>
+                                </div>
+                            </div>
+                            <i data-lucide="check-circle" class="text-green-500"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="file-text" class="text-blue-500"></i>
+                                <div>
+                                    <p class="font-medium text-gray-800">T4_Slip_2024.pdf</p>
+                                    <p class="text-xs text-gray-500">Analyzed & ready for use</p>
+                                </div>
+                            </div>
+                            <i data-lucide="check-circle" class="text-green-500"></i>
+                        </div>
+                    </div>
+                </div>
+            `,
+            chat: `
+                <div class="flex flex-col h-full animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Guidance Navigator</h2>
+                    <div id="chat-window" class="flex-grow bg-white rounded-xl shadow-sm border p-4 space-y-4 overflow-y-auto">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-600 text-white p-2 rounded-full flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                            <div class="bg-gray-200 p-3 rounded-lg rounded-tl-none">
+                                <p class="text-sm text-gray-800">Hello! I'm your AI assistant. How can I help you understand your benefits or applications today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <input id="chat-input" type="text" placeholder="Ask 'What is AGI?'" class="flex-grow border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <button id="send-btn" class="bg-blue-600 text-white font-semibold p-3 rounded-lg flex items-center justify-center hover:bg-blue-700">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
+                </div>
+            `
+        };
+
+        function navigate(page) {
+            mainContent.innerHTML = templates[page];
+            lucide.createIcons(); // Re-render icons
+
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('text-blue-600', 'bg-blue-50');
+                item.classList.add('text-gray-500');
+            });
+            const activeItem = document.querySelector(`button[onclick="navigate('${page}')"]`);
+            if (activeItem) {
+                activeItem.classList.add('text-blue-600', 'bg-blue-50');
+                activeItem.classList.remove('text-gray-500');
+            }
+            
+            // Add event listeners for dynamic content
+            if (page === 'documents') {
+                document.getElementById('upload-btn').addEventListener('click', simulateUpload);
+            }
+            if (page === 'chat') {
+                const sendBtn = document.getElementById('send-btn');
+                const chatInput = document.getElementById('chat-input');
+                sendBtn.addEventListener('click', handleChat);
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleChat();
+                });
+            }
+        }
+        
+        function simulateUpload() {
+            const uploadBtn = document.getElementById('upload-btn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Analyzing...</span>
+            `;
+
+            setTimeout(() => {
+                const docList = document.getElementById('doc-list');
+                const newDoc = document.createElement('div');
+                newDoc.className = 'bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between animate-fade-in';
+                newDoc.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="file-text" class="text-blue-500"></i>
+                        <div>
+                            <p class="font-medium text-gray-800">Lease_Agreement.pdf</p>
+                            <p class="text-xs text-gray-500">Analyzed & ready for use</p>
+                        </div>
+                    </div>
+                    <i data-lucide="check-circle" class="text-green-500"></i>
+                `;
+                docList.appendChild(newDoc);
+                lucide.createIcons();
+
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = `
+                    <i data-lucide="upload-cloud"></i>
+                    <span>Upload</span>
+                `;
+                lucide.createIcons();
+            }, 2000);
+        }
+
+        function handleChat() {
+            const chatInput = document.getElementById('chat-input');
+            const chatWindow = document.getElementById('chat-window');
+            const userMessage = chatInput.value.trim();
+
+            if (!userMessage) return;
+
+            // Display user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end';
+            userBubble.innerHTML = `
+                <div class="bg-blue-600 text-white p-3 rounded-lg rounded-br-none">
+                    <p class="text-sm">${userMessage}</p>
+                </div>
+            `;
+            chatWindow.appendChild(userBubble);
+            chatInput.value = '';
+
+            // Bot response
+            setTimeout(() => {
+                let botReply = "I'm sorry, I can only provide information on specific terms right now. Try asking 'What is AGI?'.";
+                if (userMessage.toLowerCase().includes('agi')) {
+                    botReply = "AGI stands for Adjusted Gross Income. It's your gross income (wages, dividends, etc.) minus certain specific deductions. It's a key figure used to determine your tax liability.";
+                }
+
+                const botBubble = document.createElement('div');
+                botBubble.className = 'flex items-start space-x-3';
+                botBubble.innerHTML = `
+                    <div class="bg-blue-600 text-white p-2 rounded-full flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                    <div class="bg-gray-200 p-3 rounded-lg rounded-tl-none">
+                        <p class="text-sm text-gray-800">${botReply}</p>
+                    </div>
+                `;
+                chatWindow.appendChild(botBubble);
+                lucide.createIcons();
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 1000);
+        }
+
+
+        // Initial load
+        window.onload = () => {
+            navigate('dashboard');
+        };
+
+    </script>
+</body>
+</html>

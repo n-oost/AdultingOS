@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdultingOS - Project Workflow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Calm Accents -->
+    <!-- Application Structure Plan: A task-oriented project management dashboard. The structure is designed to guide the developer through the project lifecycle chronologically, from foundational setup to feature development and final integration. It uses interactive filters (Phase, Priority) to allow the user to drill down into specific areas of focus. The main view is a timeline/Kanban-style layout of tasks, which is the most intuitive way to represent a project plan. This structure was chosen because the source document is a project proposal, and the user's goal is to understand the workflow and implementation steps. A linear, filterable task board directly addresses this need. -->
+    <!-- Visualization & Content Choices: 
+        - Project Timeline (Gantt Chart): Goal is to show change over time and task dependencies. A horizontal bar chart (Gantt) is the standard and most effective visualization for this. Interaction: Tooltips on hover provide more detail. Justification: Provides an immediate, high-level overview of the entire project schedule. Library: Chart.js.
+        - Task Breakdown (Interactive Cards): Goal is to organize and detail individual project tasks. Structured HTML/CSS cards are used for clarity. Interaction: Users can filter these cards by phase or priority. Justification: This allows for easy deep-dives into specific workstreams (e.g., "what are all the high-priority backend tasks?"). Method: HTML/CSS with JS for filtering logic.
+        - Tech Stack & Components (Diagram-like layout): Goal is to organize the system architecture. A grouped list using HTML/CSS mimics a simple architectural diagram. Interaction: None needed, it's for informational purposes. Justification: Clearly communicates the key technical components of the project without complex visuals. Method: Tailwind CSS grid.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4; /* Warm Ivory */
+            color: #4A4A4A;
+        }
+        .task-card {
+            border-left-width: 4px;
+            transition: all 0.3s ease;
+        }
+        .priority-high { border-color: #E57373; } /* Muted Red */
+        .priority-medium { border-color: #FFB74D; } /* Muted Orange */
+        .priority-low { border-color: #81C784; } /* Muted Green */
+
+        .phase-foundation { background-color: #E3F2FD; }
+        .phase-development { background-color: #FFF9C4; }
+        .phase-integration { background-color: #E8F5E9; }
+
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <main class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">AdultingOS: Project Workflow</h1>
+            <p class="text-lg text-gray-600 mt-2">A prioritized development plan from foundation to prototype.</p>
+        </header>
+
+        <!-- Timeline Section -->
+        <section class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Project Timeline Overview (Oct - Dec 2025)</h2>
+            <div class="chart-container">
+                <canvas id="ganttChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-4">This chart provides a high-level visual of the project phases and their durations. It helps in understanding the critical path and ensuring the project stays on track for the December 2025 deadline.</p>
+        </section>
+
+        <!-- Filters Section -->
+        <section id="filters" class="mb-8 p-4 bg-white rounded-2xl shadow-lg sticky top-4 z-10">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <div class="filter-group">
+                    <span class="font-semibold mr-3 text-gray-700">Filter by Phase:</span>
+                    <button class="btn bg-blue-100 text-blue-800 px-4 py-2 rounded-full" data-filter-type="phase" data-filter-value="all">All</button>
+                    <button class="btn bg-blue-100 text-blue-800 px-4 py-2 rounded-full" data-filter-type="phase" data-filter-value="foundation">Foundation</button>
+                    <button class="btn bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full" data-filter-type="phase" data-filter-value="development">Development</button>
+                    <button class="btn bg-green-100 text-green-800 px-4 py-2 rounded-full" data-filter-type="phase" data-filter-value="integration">Integration</button>
+                </div>
+                <div class="filter-group">
+                    <span class="font-semibold mr-3 text-gray-700">Filter by Priority:</span>
+                    <button class="btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full" data-filter-type="priority" data-filter-value="all">All</button>
+                    <button class="btn bg-red-100 text-red-800 px-4 py-2 rounded-full" data-filter-type="priority" data-filter-value="high">High</button>
+                    <button class="btn bg-orange-100 text-orange-800 px-4 py-2 rounded-full" data-filter-type="priority" data-filter-value="medium">Medium</button>
+                    <button class="btn bg-green-100 text-green-800 px-4 py-2 rounded-full" data-filter-type="priority" data-filter-value="low">Low</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Introduction to Workflow -->
+        <div class="text-center mb-8">
+             <p class="text-gray-600 max-w-3xl mx-auto">This interactive workflow breaks down the "AdultingOS" project into three distinct phases. Each task is prioritized to ensure a logical and efficient development process, focusing on building a solid foundation before moving to complex AI features, and finally integrating everything into a cohesive application for testing. Use the filters above to explore the tasks for each phase and priority level.</p>
+        </div>
+
+
+        <!-- Task Board -->
+        <div id="task-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Tasks will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <script>
+        const tasks = [
+            { 
+                phase: 'foundation', priority: 'high', title: 'Task 1: Project & Environment Setup', 
+                content: 'Initialize React Native project, set up version control (Git), and configure development environments (iOS/Android emulators, IDEs).',
+                advice: 'Do this first. A stable and consistent development environment prevents countless issues down the line. It is the bedrock of the entire project.'
+            },
+            { 
+                phase: 'foundation', priority: 'high', title: 'Task 2: Backend & Authentication Setup', 
+                content: 'Set up Firebase/backend service. Implement secure user registration, login, and profile management. Define the basic data structure for user profiles.',
+                advice: 'User data security is paramount. Tackle this early. You cannot build user-specific features without a robust concept of a "user" and a session.'
+            },
+            { 
+                phase: 'foundation', priority: 'medium', title: 'Task 3: UI/UX Wireframing', 
+                content: 'Create low-fidelity wireframes for the main app screens: Login, Dashboard, Document Upload, Eligibility Results, and Chatbot Interface.',
+                advice: 'Before writing UI code, sketch the user flow. This clarifies the app structure and saves significant time during component development.'
+            },
+            { 
+                phase: 'development', priority: 'high', title: 'Task 4.1: Document Intelligence (Backend)', 
+                content: 'Build the core Python OCR/NER pipeline. Create a simple API endpoint (e.g., using Flask or FastAPI) that accepts a document and returns structured JSON.',
+                advice: 'Focus entirely on the backend logic first. Use sample documents to test and refine the data extraction accuracy. This is the most complex technical piece.'
+            },
+             { 
+                phase: 'development', priority: 'high', title: 'Task 5.1: Eligibility Forecaster (Backend)', 
+                content: 'Develop the rules engine in Python. This service should take user data (from the OCR service) and determine potential benefit eligibility.',
+                advice: 'Start with a simple set of rules for 2-3 benefits. The goal is to prove the logic works. The complexity can be expanded later. This is the "brain" of your app.'
+            },
+            { 
+                phase: 'development', priority: 'medium', title: 'Task 4.2: Document Upload UI (Frontend)', 
+                content: 'In React Native, build the interface for file selection/camera access and upload functionality that communicates with your backend API.',
+                advice: 'While the backend is being built, you can develop this using a mock API. This allows for parallel workstreams. The UI should be simple and intuitive.'
+            },
+             { 
+                phase: 'development', priority: 'medium', title: 'Task 5.2: Eligibility Results UI (Frontend)', 
+                content: 'Design and build the React Native components to display the eligibility results returned from the backend. Use clear and concise card-based layouts.',
+                advice: 'Focus on clear communication of information. Use mock data to perfect the layout before the backend API is finalized. This is the core value proposition for the user.'
+            },
+            { 
+                phase: 'development', priority: 'low', title: 'Task 6: Conversational Navigator (Chatbot)', 
+                content: 'Develop the chatbot interface in React Native and integrate an LLM API. Craft the initial system prompts to guide the AI\'s responses.',
+                advice: 'This can be worked on last among the core features. The value of the chatbot is enhanced by having access to the user\'s data from other features.'
+            },
+            { 
+                phase: 'integration', priority: 'high', title: 'Task 7: Full Feature Integration', 
+                content: 'Connect all frontend and backend components into a single, cohesive user flow: Login -> Upload -> Processing -> Display Results -> Chat.',
+                advice: 'This is the most critical phase. Allocate ample time for debugging the connections between services. The goal is a seamless end-to-end experience.'
+            },
+            { 
+                phase: 'integration', priority: 'high', title: 'Task 8: User Acceptance Testing (UAT)', 
+                content: 'Conduct testing with 3-5 target users. Prepare test scripts and scenarios. Meticulously document all feedback and identified bugs.',
+                advice: 'Real user feedback is invaluable. Observe how users interact with the app without guidance to identify confusing parts of your UI/UX.'
+            },
+            { 
+                phase: 'integration', priority: 'medium', title: 'Task 9: Refinement & Bug Fixing', 
+                content: 'Based on UAT feedback, prioritize and fix critical bugs and make usability improvements. Polish the UI and user experience.',
+                advice: 'Focus on the feedback that has the most impact on the core user experience. Perfection is not the goal; a functional and validated prototype is.'
+            },
+             { 
+                phase: 'integration', priority: 'low', title: 'Task 10: Final Documentation', 
+                content: 'Prepare the final project report, user guides, and technical documentation required for your capstone project submission.',
+                advice: 'Do this last, once the application is stable. It ensures your documentation accurately reflects the final state of the prototype.'
+            }
+        ];
+
+        const taskBoard = document.getElementById('task-board');
+        let currentFilters = { phase: 'all', priority: 'all' };
+
+        const phaseColorMap = {
+            foundation: 'bg-blue-50',
+            development: 'bg-yellow-50',
+            integration: 'bg-green-50'
+        };
+
+        const renderTasks = () => {
+            taskBoard.innerHTML = '';
+            const filteredTasks = tasks.filter(task => {
+                const phaseMatch = currentFilters.phase === 'all' || task.phase === currentFilters.phase;
+                const priorityMatch = currentFilters.priority === 'all' || task.priority === currentFilters.priority;
+                return phaseMatch && priorityMatch;
+            });
+
+            if (filteredTasks.length === 0) {
+                taskBoard.innerHTML = `<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center text-gray-500 py-12">
+                    <p class="text-xl">No tasks match the current filters.</p>
+                    <p>Try selecting a different phase or priority.</p>
+                </div>`;
+                return;
+            }
+
+            filteredTasks.forEach(task => {
+                const card = document.createElement('div');
+                card.className = `task-card ${phaseColorMap[task.phase]} priority-${task.priority} p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold text-gray-800">${task.title}</h3>
+                        <span class="text-sm font-medium capitalize px-3 py-1 rounded-full ${task.phase === 'foundation' ? 'bg-blue-200 text-blue-800' : task.phase === 'development' ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'}">${task.phase}</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">${task.content}</p>
+                    <div class="bg-white p-3 rounded-md border border-gray-200">
+                        <strong class="text-gray-700">Implementation Advice:</strong>
+                        <p class="text-gray-600 text-sm mt-1">${task.advice}</p>
+                    </div>
+                `;
+                taskBoard.appendChild(card);
+            });
+        };
+
+        document.getElementById('filters').addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const { filterType, filterValue } = e.target.dataset;
+                currentFilters[filterType] = filterValue;
+                
+                // Update active button styles
+                document.querySelectorAll(`button[data-filter-type="${filterType}"]`).forEach(btn => {
+                    btn.classList.remove('btn-active', 'ring-2', 'ring-offset-2');
+                    const color = btn.dataset.filterValue === 'high' ? 'ring-red-300' :
+                                  btn.dataset.filterValue === 'medium' ? 'ring-orange-300' :
+                                  btn.dataset.filterValue === 'low' ? 'ring-green-300' :
+                                  btn.dataset.filterValue === 'foundation' ? 'ring-blue-300' :
+                                  btn.dataset.filterValue === 'development' ? 'ring-yellow-300' :
+                                  btn.dataset.filterValue === 'integration' ? 'ring-green-300' : 'ring-gray-300';
+                    btn.classList.remove('ring-red-300', 'ring-orange-300', 'ring-green-300', 'ring-blue-300', 'ring-yellow-300', 'ring-gray-300');
+                });
+                const color = e.target.dataset.filterValue === 'high' ? 'ring-red-300' :
+                              e.target.dataset.filterValue === 'medium' ? 'ring-orange-300' :
+                              e.target.dataset.filterValue === 'low' ? 'ring-green-300' :
+                              e.target.dataset.filterValue === 'foundation' ? 'ring-blue-300' :
+                              e.target.dataset.filterValue === 'development' ? 'ring-yellow-300' :
+                              e.target.dataset.filterValue === 'integration' ? 'ring-green-300' : 'ring-gray-300';
+                e.target.classList.add('btn-active', 'ring-2', 'ring-offset-2', color);
+
+                renderTasks();
+            }
+        });
+
+        // Initialize with default active buttons
+        document.querySelector('button[data-filter-value="all"][data-filter-type="phase"]').classList.add('btn-active', 'ring-2', 'ring-offset-2', 'ring-gray-300');
+        document.querySelector('button[data-filter-value="all"][data-filter-type="priority"]').classList.add('btn-active', 'ring-2', 'ring-offset-2', 'ring-gray-300');
+        
+
+        // Gantt Chart
+        const ctx = document.getElementById('ganttChart').getContext('2d');
+        const ganttChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Foundation', 'Core AI Development', 'Integration & UAT'],
+                datasets: [{
+                    label: 'Project Timeline',
+                    data: [
+                        {x: [new Date('2025-10-01'), new Date('2025-10-21')], y: 'Foundation'},
+                        {x: [new Date('2025-10-22'), new Date('2025-11-30')], y: 'Core AI Development'},
+                        {x: [new Date('2025-12-01'), new Date('2025-12-19')], y: 'Integration & UAT'},
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)', // Blue
+                        'rgba(255, 206, 86, 0.6)', // Yellow
+                        'rgba(75, 192, 192, 0.6)' // Green
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1,
+                    barPercentage: 0.5,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                const start = new Date(context.raw.x[0]).toLocaleDateString();
+                                const end = new Date(context.raw.x[1]).toLocaleDateString();
+                                label += `${start} to ${end}`;
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        min: new Date('2025-10-01').valueOf(),
+                        max: new Date('2025-12-22').valueOf(),
+                        type: 'time',
+                        time: {
+                            unit: 'week'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        renderTasks();
+    </script>
+</body>
+</html>
