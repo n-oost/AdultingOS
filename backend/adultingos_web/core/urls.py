@@ -1,24 +1,38 @@
+"""
+URL configuration for the AdultingOS core app.
+
+This module defines the API endpoint routing for tasks, tags, and authentication.
+Uses Django REST Framework's DefaultRouter for automatic URL pattern generation.
+"""
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskViewSet, TagViewSet
-from django.contrib import admin
-from django.urls import path, include
+from .views import TaskViewSet, TagViewSet, register, login_view
 
-# Create a router and register our viewsets with it.
+# Create a DRF router for automatic URL generation
+# This creates standard CRUD endpoints for ViewSets
 router = DefaultRouter()
+
+# Register ViewSets with the router
+# This automatically creates the following endpoints:
+# - /api/tasks/ (GET: list, POST: create)  
+# - /api/tasks/{id}/ (GET: retrieve, PUT: update, DELETE: delete)
+# - /api/tasks/{id}/mark_complete/ (POST: custom action)
+# - /api/tasks/{id}/mark_incomplete/ (POST: custom action)
 router.register(r'tasks', TaskViewSet, basename='task')
+
+# Tag endpoints:
+# - /api/tags/ (GET: list, POST: create)
+# - /api/tags/{id}/ (GET: retrieve, PUT: update, DELETE: delete) 
 router.register(r'tags', TagViewSet, basename='tag')
 
-# The API URLs are now determined automatically by the router.
+# Define URL patterns
+# Combines auto-generated router URLs with custom authentication endpoints
 urlpatterns = [
+    # Include all router-generated URLs (tasks and tags endpoints)
     path('', include(router.urls)),
-  
-    urlpatterns = [
-        path('admin/', admin.site.urls),
-        # Add the core app's API URLs
-        path('api/', include('core.urls')),
-        # Add DRF's built-in login/logout views for the browsable API
-        path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    ]
+    
+    # Authentication endpoints (not handled by ViewSets)
+    path('auth/register/', register, name='register'),
+    path('auth/login/', login_view, name='login'),
 ]

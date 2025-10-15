@@ -2,14 +2,56 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Backend",
+            "label": "Run Django Server",
             "type": "shell",
-            "command": "cd backend && uvicorn main:app --host 127.0.0.1 --port 8001 --reload",
-            "problemMatcher": [],
+            "command": "cd backend/adultingos_web; python manage.py runserver 127.0.0.1:8000",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^Performing system checks",
+                    "endsPattern": "^Starting development server"
+                }
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": false
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
+            }
+        },
+        {
+            "label": "Run API Tests",
+            "type": "shell",
+            "command": "timeout /t 3 /nobreak >nul; python backend/test_api.py",
+            "dependsOn": ["Run Django Server"],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
             },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Backend (FastAPI)",
+            "type": "shell",
+            "command": "cd backend && uvicorn main:app --host 127.0.0.1 --port 8001 --reload",
+            "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
                 "panel": "new"
@@ -38,7 +80,7 @@
         {
             "label": "Run All",
             "dependsOn": [
-                "Run Backend",
+                "Run Django Server",
                 "Run Frontend"
             ],
             "problemMatcher": []
