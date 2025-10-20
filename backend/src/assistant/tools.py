@@ -12,7 +12,7 @@ from typing import List, Optional
 
 from pydantic import ValidationError
 
-from backend.src.models import Task
+from src.models import Task
 
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data"))

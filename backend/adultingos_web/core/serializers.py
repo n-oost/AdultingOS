@@ -9,7 +9,7 @@ incoming data should be validated and processed.
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Task, Tag
+from .models import Task, Tag, UserProfile
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -145,3 +145,35 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Must include both username and password.')
         
         return attrs
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserProfile model.
+    
+    Handles converting UserProfile instances to/from JSON for API responses.
+    Used for onboarding flow and personalized task generation.
+    """
+    
+    username = serializers.CharField(source='user.username', read_only=True)
+    
+    class Meta:
+        model = UserProfile
+        fields = [
+            'id', 'username', 'age', 'occupation', 'is_student',
+            'filing_status', 'has_dependents', 'dependent_count',
+            'typical_tax_filing_month', 'has_hsa', 'has_401k',
+            'is_homeowner', 'has_student_loans', 'has_health_insurance',
+            'insurance_renewal_month', 'recent_life_events',
+            'preferred_reminder_frequency', 'onboarding_completed',
+            'profile_completeness', 'last_profile_update',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'username', 'profile_completeness', 'created_at', 'updated_at']
+    
+    def update(self, instance, validated_data):
+        """Update profile and recalculate completeness."""
+        instance = super().update(instance, validated_data)
+        instance.calculate_completeness()
+        instance.save()
+        return instance

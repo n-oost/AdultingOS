@@ -1,8 +1,8 @@
 """
 Data models for the AdultingOS backend.
 """
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from pydantic import BaseModel, Field, ConfigDict
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 
@@ -17,8 +17,8 @@ class Task(BaseModel):
     completed: bool = False
     tags: List[str] = []
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "File taxes",
                 "description": "Gather documents and file annual tax return",
@@ -28,6 +28,7 @@ class Task(BaseModel):
                 "tags": ["finance", "important", "annual"]
             }
         }
+    )
 
 
 class User(BaseModel):
@@ -37,10 +38,10 @@ class User(BaseModel):
     email: str
     full_name: Optional[str] = None
     joined_date: datetime = datetime.now()
-    preferences: Dict[str, any] = {}
+    preferences: Dict[str, Any] = {}
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "username": "adultuser",
                 "email": "user@example.com",
@@ -51,3 +52,4 @@ class User(BaseModel):
                 }
             }
         }
+    )

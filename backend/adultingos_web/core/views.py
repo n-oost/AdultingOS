@@ -11,12 +11,13 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.db.models import Q
-from .models import Task, Tag
+from .models import Task, Tag, UserProfile
 from .serializers import (
     TaskSerializer, 
     TagSerializer, 
     UserRegistrationSerializer, 
-    UserLoginSerializer
+    UserLoginSerializer,
+    UserProfileSerializer
 )
 
 
@@ -237,3 +238,52 @@ def login_view(request):
     
     # Return validation errors if login failed
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for user profile management.
+    
+    Provides CRUD operations for the current user's profile.
+    Used for onboarding and personalized task generation.
+    
+    Available endpoints:
+    - GET /api/profile/me/ - Get current user's profile
+    - PATCH /api/profile/update_me/ - Update current user's profile
+    """
+    
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Return only the current user's profile."""
+        return UserProfile.objects.filter(user=self.request.user)
+    
+    def get_object(self):
+        """Always return the current user's profile (or create if missing)."""
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        return profile
+    
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """
+        Get current user's profile.
+        
+        GET /api/profile/me/
+        """
+        profile = self.get_object()
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['patch'])
+    def update_me(self, request):
+        """
+        Update current user's profile.
+        
+        PATCH /api/profile/update_me/
+        """
+        profile = self.get_object()
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

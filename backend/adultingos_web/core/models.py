@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Tag(models.Model):
     """
@@ -119,4 +120,78 @@ class Task(models.Model):
         # Order by priority (highest first), then due date (earliest first)
         ordering = ['-priority', 'due_date']
 
-#class UserProfile(models.Model):
+class UserProfile(models.Model):
+    """Stores user's life context for personalized task generation."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    
+    # Demographics
+    age = models.IntegerField(null=True, blank=True)
+    occupation = models.CharField(max_length=100, null=True, blank=True)
+    is_student = models.BooleanField(default=False)
+    
+    # Financial context
+    filing_status = models.CharField(
+        max_length=20, 
+        choices=[
+            ('single', 'Single'),
+            ('married_joint', 'Married Filing Jointly'),
+            ('married_separate', 'Married Filing Separately'),
+            ('head_of_household', 'Head of Household'),
+        ],
+        null=True, 
+        blank=True
+    )
+    has_dependents = models.BooleanField(default=False)
+    dependent_count = models.IntegerField(default=0)
+    
+    # Tax context
+    typical_tax_filing_month = models.IntegerField(
+        null=True, 
+        blank=True,
+        help_text="1-12, when user typically files taxes"
+    )
+    has_hsa = models.BooleanField(default=False)
+    has_401k = models.BooleanField(default=False)
+    is_homeowner = models.BooleanField(default=False)
+    has_student_loans = models.BooleanField(default=False)
+    
+    # Health & benefits
+    has_health_insurance = models.BooleanField(default=False)
+    insurance_renewal_month = models.IntegerField(null=True, blank=True)
+    
+    # Life events (tracked for milestone tasks)
+    recent_life_events = models.JSONField(default=list, blank=True)
+    
+    # Preferences
+    preferred_reminder_frequency = models.CharField(
+        max_length=20,
+        choices=[
+            ('weekly', 'Weekly'),
+            ('biweekly', 'Bi-weekly'),
+            ('monthly', 'Monthly'),
+        ],
+        default='weekly'
+    )
+    
+    # Profile completion tracking
+    onboarding_completed = models.BooleanField(default=False)
+    profile_completeness = models.IntegerField(default=0)
+    last_profile_update = models.DateTimeField(auto_now=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Profile for {self.user.username}"
+    
+    def calculate_completeness(self):
+        """Calculate profile completeness percentage."""
+        fields = [
+            self.age, self.occupation, self.filing_status,
+            self.typical_tax_filing_month, 
+        ]
+        filled = sum(1 for f in fields if f is not None)
+        total = len(fields) + 6  # Boolean fields
+        
+        self.profile_completeness = int((filled / total) * 100)
+        return self.profile_completeness

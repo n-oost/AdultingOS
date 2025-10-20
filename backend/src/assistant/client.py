@@ -13,7 +13,7 @@ try:
 except Exception:  # pragma: no cover - optional dependency
     OpenAI = None  # type: ignore
 
-from backend.src.settings import get_settings
+from src.settings import get_settings
 
 Role = Literal["system", "user", "assistant"]
 

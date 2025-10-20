@@ -35,16 +35,20 @@ except Exception:
 
 # Routers
 try:
-    from backend.src.assistant.router import router as assistant_router
+    from src.assistant.router import router as assistant_router
     app.include_router(assistant_router)
-except Exception:
+    print("✓ Assistant router loaded")
+except Exception as e:
+    print(f"✗ Assistant router failed: {e}")
     # Keep API usable even if assistant optional deps missing
     pass
 
 try:
-    from backend.src.tasks import router as tasks_router
+    from src.tasks import router as tasks_router
     app.include_router(tasks_router)
-except Exception:
+    print("✓ Tasks router loaded")
+except Exception as e:
+    print(f"✗ Tasks router failed: {e}")
     pass
 
 # --- In-memory storage for conversation state and user profile ---

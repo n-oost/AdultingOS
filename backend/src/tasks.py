@@ -5,8 +5,8 @@ from fastapi import APIRouter, HTTPException, Path, Body
 from typing import List
 import uuid
 
-from backend.src.models import Task
-from backend.src.utils import format_response
+from src.models import Task
+from src.utils import format_response
 
 # Create a router for task management
 router = APIRouter(prefix="/tasks", tags=["tasks"])

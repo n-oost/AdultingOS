@@ -9,9 +9,10 @@ from typing import List, Optional, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from backend.src.assistant.client import LLMClient
-from backend.src.assistant.tools import list_tasks, create_task, complete_task
-from backend.src.settings import get_settings
+from src.assistant.client import LLMClient
+from src.assistant.tools import list_tasks, create_task, complete_task
+from src.knowledge_base.kb import FormKnowledgeBase, format_results_plain
+from src.settings import get_settings
 
 router = APIRouter()
 settings = get_settings()
@@ -56,12 +57,32 @@ def chat(req: ChatRequest) -> ChatResponse:
 
 def _handle_command(text: str) -> str:
     parts = text.split()
-    if len(parts) < 2 or parts[0] != "/task":
+    if not parts:
+        return "Empty command."
+
+    # Knowledge base search: /kb search <query>
+    if parts[0] == "/kb":
+        if len(parts) >= 2 and parts[1].lower() == "search":
+            query = text.split("search", 1)[1].strip() if "search" in text else ""
+            if not query:
+                return "Usage: /kb search <query>"
+            kb = FormKnowledgeBase()
+            results = kb.search(query, top_k=5)
+            return format_results_plain(results)
+        return (
+            "Unknown /kb command. Try:\n"
+            "/kb search how to apply cpp\n"
+            "/kb search TD1 Ontario 2025"
+        )
+
+    # Task commands
+    if parts[0] != "/task" or len(parts) < 2:
         return (
             "Unknown command. Try:\n"
             "/task list\n"
             "/task add \"Title\" --desc \"...\" --cat \"...\" --due 2025-12-31 --priority 2 --tags home,finance\n"
-            "/task done <task_id>"
+            "/task done <task_id>\n"
+            "/kb search <query>"
         )
 
     sub = parts[1].lower()
