@@ -1,5 +1,9 @@
 """
-Configuration module for the AdultingOS backend.
+Configuration module for the FastAPI backend of AdultingOS.
+
+This module loads environment variables for various settings such as API version,
+server host/port, database URL, security keys, and feature flags. It provides
+a centralized place to manage application-wide configuration.
 """
 import os
 from dotenv import load_dotenv

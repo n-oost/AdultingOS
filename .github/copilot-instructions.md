@@ -6,7 +6,7 @@ This repo has two backends (Django + FastAPI), a web frontend (React), and a mob
 - Django REST API (primary app)
 	- Location: `backend/adultingos_web`
 	- Auth: DRF Token Authentication, returned by custom endpoints in `core/views.py` (`/api/auth/register/`, `/api/auth/login/`).
-	- Models: `core/models.py` (`Task`, `Tag`); serializers in `core/serializers.py` add computed fields like `priority_display`, `is_overdue` and expose tag names.
+	- Models: `core/models.py` (`Task`, `Tag`, `UserProfile`); serializers in `core/serializers.py` add computed fields like `priority_display`, `is_overdue` and expose tag names.
 	- Routes: `adultingos_web/urls.py` includes `core/urls.py` under `/api/`.
 	- Task endpoints: `TaskViewSet` with query params `completed=true|false`, `category`, `priority=1..5`, `search`; custom actions: `POST /api/tasks/{id}/mark_complete/`, `POST /api/tasks/{id}/mark_incomplete/`.
 	- CORS: `corsheaders` enabled in `adultingos_web/settings.py` with dev origins `http://127.0.0.1:3000` and `http://localhost:3000`.

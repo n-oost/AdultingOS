@@ -1,5 +1,9 @@
 """
-Utility functions for the AdultingOS backend.
+General utility functions for the FastAPI backend of AdultingOS.
+
+This module provides helper functions such as `format_response` for consistent API
+output structuring and `validate_input` for checking required fields in incoming data.
+These utilities are designed to be generic and reusable across different FastAPI modules.
 """
 
 def format_response(data, status="success", message=""):

@@ -1,70 +1,57 @@
 # AdultingOS Project Documentation
 
 ## Project Overview
-AdultingOS is a comprehensive application designed to help users navigate the challenges of adult life. It features a Python/FastAPI backend and a React frontend, with functionality for task management, user profiles, and a conversational interface for gathering user information.
+AdultingOS is a comprehensive application designed to help users navigate the challenges of adult life. It features a dual-backend system (Django and FastAPI), a React web frontend, and a React Native mobile app. Its core functionality includes robust task management and a conversational AI assistant.
 
 ## Project Structure
 The project follows a modern, clean architecture with clear separation between frontend and backend components:
 
-### Backend (Python/FastAPI)
-- `/backend`: Contains the Python/FastAPI backend code
-  - `/src`: Source code modules
-    - `__init__.py`: Package initialization
-    - `config.py`: Application configuration and environment variables
-    - `models.py`: Data models using Pydantic
-    - `tasks.py`: Task management API endpoints
-    - `utils.py`: Utility functions
-  - `/data`: Directory for data storage
-  - `/tests`: Unit and integration tests
-    - `__init__.py`: Test package initialization
-    - `test_utils.py`: Tests for utility functions
-  - `main.py`: Main application entry point
-  - `requirements.txt`: Python dependencies
-  - `.env.example`: Example environment variables
+### Backends (Python)
+- `/backend/adultingos_web`: The primary backend, built with **Django REST Framework**. It manages the database (PostgreSQL), user authentication, and provides a RESTful API for tasks, tags, and user profiles.
+- `/backend/src`: A secondary backend, built with **FastAPI**. It serves the AI assistant, handling chat logic and slash-commands by communicating with the Django API.
+  - `/assistant`: Contains the router, LLM client, and logic for the AI assistant.
+  - `main.py`: The entry point for the FastAPI application.
 
 ### Frontend (React)
 - `/frontend`: Contains the React frontend application
   - `/src`: Source code components
     - `App.js`: Main React application component
-    - `components/`: Reusable UI components
-      - `Chatbot.js`: Chatbot interface component
+    - `services/apiService.js`: API wrapper for Django endpoints.
   - `/public`: Static assets
 
 ## Key Features
 
 ### Task Management System
-The application includes a RESTful API for managing tasks with endpoints for:
+The application includes a robust, database-backed RESTful API (powered by Django) for managing tasks, with endpoints for:
 - Creating new tasks
 - Retrieving all tasks
 - Retrieving specific tasks by ID
 - Updating tasks
 - Deleting tasks
+- Filtering by status, category, priority, and search terms.
 
 Each task has properties like title, description, category, due date, priority, and completion status.
 
 ### User Profile System
-The application captures user profile information through a conversational interface, asking questions about:
-- Student status
-- Income level
-- Housing situation (rent or own)
-- Marital status
+The Django backend manages user profiles, storing context like student status, income level, and housing situation. This data can be used for generating personalized tasks and reminders.
 
 ### Conversational Interface
-The application features a chatbot-like interface that guides users through a series of questions to build their profile.
+The FastAPI backend provides an AI assistant with a chat interface. It can answer questions and perform actions (like adding or listing tasks) via slash-commands, which are executed by calling the main Django API.
 
 ## Technical Implementation
 
 ### Backend
-The backend is built with FastAPI, providing a high-performance, easy-to-use framework for building APIs with Python. Key components include:
+The backend is a dual-service architecture:
+- **Django REST Framework**: Serves as the single source of truth. It handles all database interactions, user authentication (via tokens), and provides a comprehensive API for tasks and user data.
+- **FastAPI**: Provides a high-performance API for the AI assistant. Its primary role is to process chat messages and translate slash-commands into API calls to the Django backend.
 
 1. **API Endpoints**:
-   - RESTful endpoints for task management
-   - Endpoint for the chat interface
+   - Django: `/api/tasks/`, `/api/tags/`, `/api/auth/login/`, etc.
+   - FastAPI: `/assistant/chat`
 
 2. **Data Models**:
-   - `Task`: Model for representing tasks with fields like title, description, priority, etc.
-   - `User`: Model for representing user profiles
-   - `ChatMessage`: Model for representing chat messages
+   - **Django Models**: `Task`, `Tag`, `UserProfile`, and `User` models are defined in `backend/adultingos_web/core/models.py` and backed by a PostgreSQL database.
+   - **Pydantic Models**: Used within the FastAPI service for request/response validation (e.g., `ChatRequest`).
 
 3. **Utility Functions**:
    - `format_response`: Standardizes API responses
@@ -93,7 +80,7 @@ The frontend is built with React, providing a modern, component-based UI framewo
 
 ### Backend Setup
 1. Navigate to the backend directory:
-   ```
+   ```sh
    cd backend
    ```
 
@@ -101,16 +88,20 @@ The frontend is built with React, providing a modern, component-based UI framewo
    ```
    pip install -r requirements.txt
    ```
-
-3. Run the server:
+3. Set up and run the Django database and server (see `backend/adultingos_web/` README).
+   ```sh
+   python adultingos_web/manage.py runserver
    ```
+
+4. Run the FastAPI server in a separate terminal:
+   ```sh
    uvicorn main:app --host 127.0.0.1 --port 8001 --reload
    ```
 
 ### Frontend Setup
 1. Navigate to the frontend directory:
    ```
-   cd frontend
+   cd ../frontend
    ```
 
 2. Install dependencies:
@@ -129,9 +120,10 @@ The application should now be accessible at `http://localhost:3000`.
 The project includes VS Code tasks for easy development:
 
 - **Run Backend**: Starts the FastAPI server with hot reloading
+- **Run Django Server**: Starts the Django REST API server.
 - **Run Frontend**: Starts the React development server
 - **Run All Tests**: Runs all backend tests
-- **Run All**: Starts both backend and frontend servers
+- **Run All**: Starts both backend services and the frontend server.
 
 ## Development Best Practices
 
@@ -158,8 +150,8 @@ The project includes VS Code tasks for easy development:
 Potential areas for future development include:
 
 1. **Database Integration**:
-   - Replace in-memory storage with a proper database
-   - Add data persistence
+   - **DONE**: Task management uses a central Django-managed database.
+   - Future AI features (like memory) will also be migrated to the database.
 
 2. **Authentication**:
    - User authentication and authorization

@@ -79,14 +79,34 @@
 - [ ] JSON Schema exposure: endpoint (/api/schemas/foundational-documents) or files only?
 - [ ] Final enum sets: confirm applicationType and functionalRole values
 
-## Next Steps (After Clarifications)
-1. Implement models in `backend/adultingos_web/core/models.py`
-2. Add serializers in `backend/adultingos_web/core/serializers.py`
-3. Register in `backend/adultingos_web/core/admin.py`
-4. Place JSON Schema in `backend/adultingos_web/core/schemas/`
-5. Run makemigrations/migrate
-6. Add minimal serializer validation tests
-7. Optionally add schema endpoint for client-side validation
+## Current Session Work
+### Environment Setup
+- Configured Python environment for the project.
+- Installed Django and other required packages from `requirements.txt`.
+- Successfully ran all tests and API tests.
+
+### Test Planning
+- Reviewed existing test files (`backend/adultingos_web/core/tests.py`, `backend/tests/test_utils.py`) and core application files (`models.py`, `views.py`, `serializers.py`).
+- Created a detailed to-do list for improving test coverage across serializers and viewsets.
+- Started implementing tests for `TaskSerializer` and `TagSerializer` in `backend/adultingos_web/core/test_serializers.py`.
+
+## Next Steps (From Todo List)
+1. **Write tests for TaskSerializer and TagSerializer**
+   - Add tests for creating, updating, and validating tasks and tags via their serializers.
+2. **Write tests for user auth serializers**
+   - Test user registration with valid data, password mismatches, and existing usernames. Test user login with correct and incorrect credentials.
+3. **Write tests for UserProfileSerializer**
+   - Add tests for creating and updating a UserProfile.
+4. **Write tests for TaskViewSet**
+   - Test the CRUD operations for the TaskViewSet, including filtering by status, category, and search. Test the custom actions `mark_complete` and `mark_incomplete`.
+5. **Write tests for TagViewSet**
+   - Test the CRUD operations for the TagViewSet.
+6. **Write tests for auth views**
+   - Test the `register` and `login_view` API endpoints to ensure they handle success and error cases correctly.
+7. **Write tests for UserProfileViewSet**
+   - Test fetching and updating user profiles via the `UserProfileViewSet`.
+8. **Write tests for Application ViewSets**
+   - Add tests for all the application ViewSets: SIN, Passport, Ontario ID, and OSAP.
 
 ## Key Files
 - `.chat_notes/session_summary.md`: this file (session state and decisions)
@@ -104,3 +124,9 @@
 - Source document: `Foundational Identity Module Schema.txt` (Gov_scraper workspace)
 - JSON Schema Draft-07: https://json-schema.org/draft-07/schema
 - Django encrypted fields: https://pypi.org/project/django-fernet-fields/
+
+
+## Chat History
+---
+(Paste chat history here)
+

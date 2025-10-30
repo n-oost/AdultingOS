@@ -1,9 +1,21 @@
 """
 Views for the AdultingOS core app.
 
-This module contains the API views that handle HTTP requests for tasks, tags,
-and user authentication. Views process incoming requests, interact with the
-database through models, and return JSON responses.
+Why these views exist
+---------------------
+This module exposes REST API endpoints used by the web frontend, mobile app, and
+assistant. ViewSets are implemented to provide consistent CRUD operations for
+user-scoped resources (tasks, identity snapshots, and applications). Restricting
+querysets to the authenticated user and centralizing actions (e.g., marking
+tasks complete) keeps authorization logic simple and reduces duplication.
+
+Purpose
+-------
+Offer stable, discoverable API endpoints powered by Django REST Framework. The
+views translate HTTP requests to serializer and model operations, apply
+permission checks, and surface helpful status messages. They are intentionally
+thin—complex domain rules are enforced on models/serializers.
+
 """
 
 from rest_framework import viewsets, permissions, status
@@ -11,13 +23,22 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.db.models import Q
-from .models import Task, Tag, UserProfile
+from .models import (
+    Task, Tag, UserProfile,
+    FoundationalDocumentsSnapshot, SINApplication, PassportApplication,
+    OntarioProvincialIdApplication, OSAPApplication
+)
 from .serializers import (
-    TaskSerializer, 
-    TagSerializer, 
-    UserRegistrationSerializer, 
+    TaskSerializer,
+    TagSerializer,
+    UserRegistrationSerializer,
     UserLoginSerializer,
-    UserProfileSerializer
+    UserProfileSerializer,
+    FoundationalDocumentsSnapshotSerializer,
+    SINApplicationSerializer,
+    PassportApplicationSerializer,
+    OntarioProvincialIdApplicationSerializer,
+    OSAPApplicationSerializer,
 )
 
 
@@ -287,3 +308,63 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class FoundationalDocumentsSnapshotViewSet(viewsets.ModelViewSet):
+    """API endpoint for a user's identity snapshot.
+
+    - GET /api/identity/ - list (admin)
+    - GET /api/identity/me/ - current user's snapshot
+    - POST /api/identity/ - create snapshot
+    """
+
+    serializer_class = FoundationalDocumentsSnapshotSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = FoundationalDocumentsSnapshot.objects.all()
+
+    def get_queryset(self):
+        # Allow admins to list all; otherwise restrict to the user's snapshot
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return FoundationalDocumentsSnapshot.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        snapshot, _ = FoundationalDocumentsSnapshot.objects.get_or_create(user=request.user)
+        serializer = self.get_serializer(snapshot)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class BaseApplicationViewSet(viewsets.ModelViewSet):
+    """Common behavior for application viewsets."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only applications belonging to the current user
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class SINApplicationViewSet(BaseApplicationViewSet):
+    queryset = SINApplication.objects.all()
+    serializer_class = SINApplicationSerializer
+
+
+class PassportApplicationViewSet(BaseApplicationViewSet):
+    queryset = PassportApplication.objects.all()
+    serializer_class = PassportApplicationSerializer
+
+
+class OntarioProvincialIdApplicationViewSet(BaseApplicationViewSet):
+    queryset = OntarioProvincialIdApplication.objects.all()
+    serializer_class = OntarioProvincialIdApplicationSerializer
+
+
+class OSAPApplicationViewSet(BaseApplicationViewSet):
+    queryset = OSAPApplication.objects.all()
+    serializer_class = OSAPApplicationSerializer

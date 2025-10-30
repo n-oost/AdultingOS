@@ -9,7 +9,7 @@ Architecture
   1) Deterministic slash-commands (/task list|add|done)
   2) Chat endpoint backed by a pluggable LLM client (OpenAI or local Ollama)
 - Config via environment variables for easy provider switching.
-- Storage: JSON file for tasks (starter). Replace with DB later.
+- Storage: Task management uses the main Django database. Other assistant features may use JSON/SQLite initially.
 
 Why this approach
 - Deterministic commands guarantee correctness for core actions.
@@ -35,7 +35,7 @@ API
 - GET /assistant/tasks is not required initially (use /task list in chat).
 
 Data
-- Tasks persisted in backend/data/tasks.json for simplicity (migrate later).
+- Tasks are managed by the Django backend and persisted in its database (e.g., PostgreSQL).
 
 Security & safety
 - Do not log secrets.
@@ -65,7 +65,7 @@ Next steps (Phase 2)
    - Track latency, cost, and tool success rate.
 
 6) Migration to real DB
-   - Replace JSON with SQLite/Postgres.
+   - **DONE:** Task management now uses the Django backend's database.
    - Add Alembic migrations, repositories, and services.
 
 Ready-to-run

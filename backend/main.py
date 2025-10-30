@@ -3,10 +3,15 @@ Main file for the AdultingOS backend.
 Configured for Vercel serverless deployment.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 import os
+import httpx
+
+# --- Auth ---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # --- Data Models ---
 class ChatMessage(BaseModel):
@@ -51,20 +56,6 @@ except Exception as e:
     print(f"✗ Tasks router failed: {e}")
     pass
 
-# --- In-memory storage for conversation state and user profile ---
-# NOTE: This is a temporary solution for the MVP. In a real application, this would be a database.
-conversation_state = {
-    "question_index": 0,
-    "questions": [
-        {"id": "is_student", "text": "Are you currently a student?"},
-        {"id": "income", "text": "What is your approximate annual income?"},
-        {"id": "rent_or_own", "text": "Do you rent or own your home?"},
-        {"id": "is_married", "text": "Are you married or single?"},
-    ],
-}
-
-user_profile = {}
-
 # --- API Endpoints ---
 
 @app.get("/")
@@ -77,27 +68,15 @@ def read_root():
 
 
 @app.post("/chat")
-def chat(message: ChatMessage):
+async def chat(message: ChatMessage, token: str = Depends(oauth2_scheme)):
     """
     Handles the chatbot conversation.
     Receives a message from the user and returns a response.
     """
-    global conversation_state, user_profile
-
-    # Get the current question
-    question_index = conversation_state["question_index"]
-    questions = conversation_state["questions"]
-
-    # Store the user's answer
-    if question_index > 0:
-        previous_question = questions[question_index - 1]
-        user_profile[previous_question["id"]] = message.text
-
-    # If there are more questions, ask the next one
-    if question_index < len(questions):
-        next_question = questions[question_index]
-        conversation_state["question_index"] += 1
-        return {"text": next_question["text"], "sender": "bot"}
-    else:
-        # End of the conversation
-        return {"text": "Thank you for completing your profile!", "sender": "bot"}
+    headers = {"Authorization": f"Token {token}"}
+    async with httpx.AsyncClient() as client:
+        response = await client.get("http://localhost:8000/api/profile/me/", headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=response.status_code, detail="Error fetching user profile")

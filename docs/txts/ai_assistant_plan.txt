@@ -32,8 +32,8 @@ Next steps (Phase 2)
 2) Memory & persona
 3) RAG with embeddings
 4) Streaming & UI
-5) Observability & evals
-6) Migrate to DB
+5) Observability & evals (Task management migrated to DB)
+6) Migrate other data to DB
 
 Run (Windows)
 1) Copy backend/.env.example to backend/.env; set MODEL_PROVIDER and keys.
