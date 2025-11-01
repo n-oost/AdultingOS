@@ -368,3 +368,46 @@ class OntarioProvincialIdApplicationViewSet(BaseApplicationViewSet):
 class OSAPApplicationViewSet(BaseApplicationViewSet):
     queryset = OSAPApplication.objects.all()
     serializer_class = OSAPApplicationSerializer
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])  # Schema is public (not sensitive)
+def foundational_documents_schema_view(request):
+    """
+    Serve the JSON Schema for foundational identity documents and applications.
+    
+    Returns the complete JSON Schema Draft-07 document that defines the structure
+    and validation rules for SIN, Passport, Ontario ID, and OSAP applications.
+    
+    Available at: GET /api/schemas/foundational-documents/
+    
+    Returns:
+        JSON Schema document (application/json)
+    """
+    import json
+    import os
+    from django.conf import settings
+    from django.http import JsonResponse
+    
+    # Construct path to schema file
+    schema_path = os.path.join(
+        settings.BASE_DIR,
+        'core',
+        'schemas',
+        'foundational_documents.schema.json'
+    )
+    
+    try:
+        with open(schema_path, 'r', encoding='utf-8') as schema_file:
+            schema_data = json.load(schema_file)
+        return JsonResponse(schema_data, safe=False, status=200)
+    except FileNotFoundError:
+        return Response(
+            {'error': 'Schema file not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except json.JSONDecodeError as e:
+        return Response(
+            {'error': f'Invalid JSON in schema file: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

@@ -24,7 +24,7 @@ from .views import (
     FoundationalDocumentsSnapshotViewSet, SINApplicationViewSet,
     PassportApplicationViewSet, OntarioProvincialIdApplicationViewSet,
     OSAPApplicationViewSet,
-    register, login_view
+    register, login_view, foundational_documents_schema_view
 )
 
 # Create a DRF router for automatic URL generation
@@ -65,4 +65,7 @@ urlpatterns = [
     # Authentication endpoints (not handled by ViewSets)
     path('auth/register/', register, name='register'),
     path('auth/login/', login_view, name='login'),
+    
+    # JSON Schema endpoint (public, read-only)
+    path('schemas/foundational-documents/', foundational_documents_schema_view, name='foundational-documents-schema'),
 ]

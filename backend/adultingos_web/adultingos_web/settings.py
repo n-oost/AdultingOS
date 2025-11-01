@@ -25,7 +25,21 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-key-change-in-production-12345')
+
+# Encryption key for django-encrypted-model-fields (must be 32 url-safe base64-encoded bytes)
+# Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# Store in .env as FIELD_ENCRYPTION_KEY=<generated_key>
+# For development, generate a key from SECRET_KEY (production MUST use dedicated encryption key)
+_field_encryption_key = os.getenv('FIELD_ENCRYPTION_KEY')
+if not _field_encryption_key:
+    import base64
+    import hashlib
+    # Generate a proper Fernet key from SECRET_KEY for dev
+    _field_encryption_key = base64.urlsafe_b64encode(
+        hashlib.sha256(SECRET_KEY.encode()).digest()
+    ).decode()
+FIELD_ENCRYPTION_KEY = _field_encryption_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
@@ -81,16 +95,26 @@ WSGI_APPLICATION = 'adultingos_web.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+# Use PostgreSQL if configured, otherwise fallback to SQLite for development/testing
+if os.getenv('POSTGRES_DB'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': os.getenv('POSTGRES_HOST'),
+            'PORT': os.getenv('POSTGRES_PORT'),
+        }
     }
-}
+else:
+    # SQLite fallback for development and testing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

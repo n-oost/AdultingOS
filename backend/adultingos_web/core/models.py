@@ -38,6 +38,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from encrypted_model_fields.fields import EncryptedCharField
 
 # Foundational Identity Models
 class LegalName(models.Model):
@@ -209,12 +210,19 @@ class SINApplication(BaseApplication):
     contact_information = models.ForeignKey(ContactInformation, on_delete=models.PROTECT)
     address = models.ForeignKey(Address, on_delete=models.PROTECT)
     submitted_documents = models.ManyToManyField(SupportingDocument)
+    # Encrypted SIN field (9 digits, stored encrypted at rest)
+    sin_number = EncryptedCharField(max_length=9, null=True, blank=True, help_text="Applicant's SIN (encrypted at rest)")
 
     def clean(self):
         if self.submission_method == 'ONLINE':
             proof_of_address = self.submitted_documents.filter(functional_role='ADDRESS').exists()
             if not proof_of_address:
                 raise ValidationError("Online applications require proof of address")
+        # Validate SIN format (9 digits)
+        if self.sin_number and not self.sin_number.isdigit():
+            raise ValidationError("SIN must contain only digits")
+        if self.sin_number and len(self.sin_number) != 9:
+            raise ValidationError("SIN must be exactly 9 digits")
 
     class Meta:
         verbose_name = "SIN Application"
@@ -233,7 +241,8 @@ class PassportReference(models.Model):
 class PassportGuarantor(models.Model):
     """Model for passport guarantors."""
     full_name = models.CharField(max_length=200)
-    canadian_passport_number = models.CharField(max_length=8)
+    # Encrypted passport number (8 digits, stored encrypted at rest)
+    canadian_passport_number = EncryptedCharField(max_length=8, help_text="Guarantor's Canadian passport number (encrypted at rest)")
     years_known = models.PositiveIntegerField()
 
     def clean(self):
@@ -241,6 +250,8 @@ class PassportGuarantor(models.Model):
             raise ValidationError("Guarantor must have known the applicant for at least 2 years")
         if not len(self.canadian_passport_number) == 8:
             raise ValidationError("Canadian passport number must be 8 digits")
+        if not self.canadian_passport_number.isdigit():
+            raise ValidationError("Canadian passport number must contain only digits")
 
     def __str__(self):
         return f"{self.full_name} - Known for {self.years_known} years"

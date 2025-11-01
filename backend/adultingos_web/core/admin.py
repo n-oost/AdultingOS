@@ -68,11 +68,18 @@ class FoundationalDocumentsSnapshotAdmin(admin.ModelAdmin):
 
 @admin.register(SINApplication)
 class SINApplicationAdmin(admin.ModelAdmin):
-    list_display = ['user', 'application_type', 'submission_method', 'status', 'created_at']
+    list_display = ['user', 'application_type', 'submission_method', 'status', 'masked_sin', 'created_at']
     list_filter = ['status', 'submission_method', 'application_type']
     search_fields = ['user__username']
     date_hierarchy = 'created_at'
-    readonly_fields = ['version']
+    readonly_fields = ['version', 'masked_sin']
+    
+    def masked_sin(self, obj):
+        """Display masked SIN (***-***-123) in admin list view"""
+        if obj.sin_number:
+            return f"***-***-{obj.sin_number[-3:]}"
+        return "N/A"
+    masked_sin.short_description = "SIN (Masked)"
 
 @admin.register(PassportReference)
 class PassportReferenceAdmin(admin.ModelAdmin):
@@ -82,8 +89,16 @@ class PassportReferenceAdmin(admin.ModelAdmin):
 
 @admin.register(PassportGuarantor)
 class PassportGuarantorAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'years_known']
+    list_display = ['full_name', 'years_known', 'masked_passport']
     search_fields = ['full_name']
+    readonly_fields = ['masked_passport']
+    
+    def masked_passport(self, obj):
+        """Display masked passport number (****1234) in admin list view"""
+        if obj.canadian_passport_number:
+            return f"****{obj.canadian_passport_number[-4:]}"
+        return "N/A"
+    masked_passport.short_description = "Passport (Masked)"
 
 @admin.register(PassportApplication)
 class PassportApplicationAdmin(admin.ModelAdmin):
@@ -92,12 +107,6 @@ class PassportApplicationAdmin(admin.ModelAdmin):
     search_fields = ['user__username']
     date_hierarchy = 'created_at'
     readonly_fields = ['version']
-
-    def get_readonly_fields(self, request, obj=None):
-        # Make canadian_passport_number read-only if it exists
-        if obj and obj.guarantor:
-            return self.readonly_fields + ('guarantor__canadian_passport_number',)
-        return self.readonly_fields
 
 @admin.register(OntarioProvincialIdApplication)
 class OntarioProvincialIdApplicationAdmin(admin.ModelAdmin):
