@@ -1,122 +1,206 @@
 /**
- * Tasks Screen - Display and manage user tasks
+ * API Service for AdultingOS Mobile App
+ *
+ * Purpose:
+ * - Provide a simple wrapper around fetch for talking to the backend APIs
+ * - Centralize auth token handling and common headers
+ * - Keep each endpoint simple and well-documented
  */
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-  Alert,
-} from 'react-native';
-import { apiService } from '../services/apiService';
 
-const TasksScreen = () => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+// Base URLs for the APIs
+// TODO: Update these to point to your deployed backend or use environment variables
+const API_BASE = 'http://127.0.0.1:8000'; // Django REST API
+const ASSISTANT_BASE = 'http://127.0.0.1:8001'; // FastAPI Assistant
 
-  const loadTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await apiService.chat('/task list');
-      // Parse task list from assistant response
-      setTasks(parseTasks(response.reply));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load tasks');
-    } finally {
-      setLoading(false);
-    }
-  };
+// In-memory auth token storage
+let authToken = null;
 
-  const parseTasks = (taskText) => {
-    // Simple parser for task list format
-    const lines = taskText.split('\n').filter(line => line.trim());
-    return lines.map((line, index) => {
-      const isCompleted = line.startsWith('✔');
-      const title = line.replace(/^[•✔]\s*/, '').split('[')[0].trim();
-      return {
-        id: index.toString(),
-        title,
-        completed: isCompleted,
-      };
-    });
-  };
-
-  const toggleTask = async (taskId) => {
-    try {
-      await apiService.chat(`/task done ${taskId}`);
-      loadTasks(); // Refresh list
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update task');
-    }
-  };
-
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  const renderTask = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.taskItem, item.completed && styles.completedTask]}
-      onPress={() => toggleTask(item.id)}
-    >
-      <Text style={[styles.taskText, item.completed && styles.completedText]}>
-        {item.completed ? '✔' : '•'} {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={tasks}
-        renderItem={renderTask}
-        keyExtractor={(item) => item.id}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadTasks} />
-        }
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No tasks yet. Create one in Chat!</Text>
-        }
-      />
-    </View>
-  );
+/**
+ * Set the authentication token for subsequent API requests
+ */
+export const setAuthToken = (token) => {
+  authToken = token;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-    padding: 16,
-  },
-  taskItem: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 8,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#2563eb',
-  },
-  completedTask: {
-    borderLeftColor: '#10b981',
-    opacity: 0.7,
-  },
-  taskText: {
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  completedText: {
-    textDecorationLine: 'line-through',
-    color: '#6b7280',
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#6b7280',
-    fontSize: 16,
-    marginTop: 32,
-  },
-});
+/**
+ * Clear the authentication token
+ */
+export const clearAuthToken = () => {
+  authToken = null;
+};
 
-export default TasksScreen;
+/**
+ * Generic request helper for Django API
+ */
+async function request(endpoint, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  if (authToken) {
+    headers['Authorization'] = `Token ${authToken}`;
+  }
+
+  const config = {
+    ...options,
+    headers,
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, config);
+
+    if (!response.ok) {
+      let message = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const maybeJson = await response.json();
+        if (maybeJson && (maybeJson.detail || maybeJson.error)) {
+          message = maybeJson.detail || maybeJson.error;
+        }
+      } catch (_) {
+        // Response was not JSON
+      }
+      throw new Error(message);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API request failed:', error);
+    throw error;
+  }
+}
+
+// Authentication endpoints
+export const auth = {
+  register: async (username, email, password) => {
+    const response = await request('/api/auth/register/', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        password_confirm: password,
+      }),
+    });
+    
+    if (response.token) {
+      setAuthToken(response.token);
+    }
+    
+    return response;
+  },
+
+  login: async (username, password) => {
+    const response = await request('/api/auth/login/', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    
+    if (response.token) {
+      setAuthToken(response.token);
+    }
+    
+    return response;
+  },
+
+  logout: () => {
+    clearAuthToken();
+  },
+};
+
+// Task management endpoints
+export const tasks = {
+  list: () => request('/api/tasks/'),
+
+  create: (taskData) => request('/api/tasks/', {
+    method: 'POST',
+    body: JSON.stringify(taskData),
+  }),
+
+  update: (taskId, taskData) => request(`/api/tasks/${taskId}/`, {
+    method: 'PUT',
+    body: JSON.stringify(taskData),
+  }),
+
+  markComplete: (taskId) => request(`/api/tasks/${taskId}/mark_complete/`, {
+    method: 'POST',
+  }),
+
+  markIncomplete: (taskId) => request(`/api/tasks/${taskId}/mark_incomplete/`, {
+    method: 'POST',
+  }),
+
+  delete: (taskId) => request(`/api/tasks/${taskId}/`, {
+    method: 'DELETE',
+  }),
+};
+
+// Tag management endpoints
+export const tags = {
+  list: () => request('/api/tags/'),
+
+  create: (name) => request('/api/tags/', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  }),
+};
+
+// User profile endpoints
+export const profile = {
+  get: () => request('/api/profile/me/'),
+
+  update: (profileData) => request('/api/profile/me/', {
+    method: 'PATCH',
+    body: JSON.stringify(profileData),
+  }),
+};
+
+// Assistant/Chat endpoints (FastAPI)
+export const assistant = {
+  chat: async (message) => {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (authToken) {
+      headers['Authorization'] = `Token ${authToken}`;
+    }
+
+    try {
+      const response = await fetch(`${ASSISTANT_BASE}/chat`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ message }),
+      });
+
+      if (!response.ok) {
+        let message = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const maybeJson = await response.json();
+          if (maybeJson && (maybeJson.detail || maybeJson.error)) {
+            message = maybeJson.detail || maybeJson.error;
+          }
+        } catch (_) {
+          // Response was not JSON
+        }
+        throw new Error(message);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Assistant API request failed:', error);
+      throw error;
+    }
+  },
+};
+
+// Default export for convenience
+export const apiService = {
+  auth,
+  tasks,
+  tags,
+  profile,
+  assistant,
+  setAuthToken,
+  clearAuthToken,
+};
