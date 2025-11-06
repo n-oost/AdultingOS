@@ -1,0 +1,59 @@
+/**
+ * Auth Forms Styles
+ * Shared styles for login and registration forms
+ */
+
+.auth-form {
+  width: 100%;
+  max-width: 100%;
+}
+
+.auth-form__error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-error-50);
+  color: var(--color-error-700);
+  border: var(--border-width-1) solid var(--color-error-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+  animation: slideIn var(--duration-normal) var(--ease-out);
+}
+
+[data-theme="dark"] .auth-form__error {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: var(--color-error-700);
+}
+
+.auth-form__error svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.auth-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.auth-form__hint {
+  margin-top: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: var(--leading-relaxed);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

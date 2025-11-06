@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Header from './components/layout/Header';
+import Dashboard from './components/Dashboard';
 import Chatbot from './components/Chatbot';
-// import ApiTest from './components/ApiTest';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import TasksList from './components/TasksList';
+import Card, { CardHeader, CardBody } from './ui/Card';
+import Button from './ui/Button';
 import { setAuthToken, clearAuthToken } from './services/apiService';
 
 /**
@@ -15,6 +18,13 @@ function App() {
   const [user, setUser] = useState(null);
   // Track which form to show: 'login' or 'register'
   const [showForm, setShowForm] = useState('login');
+  // Track current view: 'dashboard', 'tasks', 'assistant'
+  const [currentView, setCurrentView] = useState('dashboard');
+  // Track theme
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
 
   useEffect(() => {
     // Load token from localStorage on boot (optional persistence)
@@ -23,6 +33,12 @@ function App() {
     if (savedToken) setAuthToken(savedToken);
     if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
+
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   function handleLoginSuccess(u, token) {
     // Store token for API and persist to localStorage
@@ -46,53 +62,108 @@ function App() {
     localStorage.removeItem('authUser');
     setUser(null);
     setShowForm('login');
+    setCurrentView('dashboard');
+  }
+
+  function toggleTheme() {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   }
 
   return (
     <div className="App">
-      <h1 style={{ fontWeight: 700, fontSize: '2.2rem', marginBottom: 18, letterSpacing: '-1px' }}>AdultingOS</h1>
+      {user && (
+        <Header 
+          user={user} 
+          onLogout={handleLogout} 
+          onThemeToggle={toggleTheme}
+          theme={theme}
+        />
+      )}
 
-      {/* Auth gate: show login/register in a card until authenticated */}
-      {!user ? (
-        <div className="card">
-          {showForm === 'login' ? (
-            <>
-              <div className="form-title">Sign In</div>
-              <LoginForm onLoginSuccess={handleLoginSuccess} />
-              <div className="form-actions" style={{ marginTop: 10 }}>
-                <button className="btn btn-alt" onClick={() => setShowForm('register')}>
-                  Need an account? Register
-                </button>
+      <main className="App__main">
+        <div className="container">
+          {/* Auth gate: show login/register in a card until authenticated */}
+          {!user ? (
+            <div className="auth-container">
+              <div className="auth-card">
+                <div className="auth-card__brand">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                  </svg>
+                  <h1>AdultingOS</h1>
+                </div>
+                
+                <Card variant="elevated">
+                  <CardHeader>
+                    <h2 className="auth-card__title">
+                      {showForm === 'login' ? 'Welcome back' : 'Create your account'}
+                    </h2>
+                    <p className="auth-card__subtitle">
+                      {showForm === 'login' 
+                        ? 'Sign in to continue to your dashboard' 
+                        : 'Get started with AdultingOS today'}
+                    </p>
+                  </CardHeader>
+                  <CardBody>
+                    {showForm === 'login' ? (
+                      <LoginForm onLoginSuccess={handleLoginSuccess} />
+                    ) : (
+                      <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
+                    )}
+                  </CardBody>
+                </Card>
+
+                <div className="auth-card__switch">
+                  {showForm === 'login' ? (
+                    <>
+                      <span>Don't have an account?</span>
+                      <Button variant="ghost" onClick={() => setShowForm('register')}>
+                        Sign up
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <span>Already have an account?</span>
+                      <Button variant="ghost" onClick={() => setShowForm('login')}>
+                        Sign in
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-            </>
+            </div>
           ) : (
             <>
-              <div className="form-title">Register</div>
-              <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
-              <div className="form-actions" style={{ marginTop: 10 }}>
-                <button className="btn btn-alt" onClick={() => setShowForm('login')}>
-                  Already have an account? Login
-                </button>
-              </div>
+              {/* Render current view based on navigation */}
+              {currentView === 'dashboard' && <Dashboard user={user} />}
+              
+              {currentView === 'tasks' && (
+                <div className="content-section">
+                  <h2 className="content-section__title">My Tasks</h2>
+                  <Card variant="default">
+                    <CardBody>
+                      <TasksList />
+                    </CardBody>
+                  </Card>
+                </div>
+              )}
+              
+              {currentView === 'assistant' && (
+                <div className="content-section">
+                  <h2 className="content-section__title">AI Assistant</h2>
+                  <Card variant="default">
+                    <CardBody>
+                      <Chatbot />
+                    </CardBody>
+                  </Card>
+                </div>
+              )}
             </>
           )}
         </div>
-      ) : (
-        <>
-          <div className="card" style={{ marginBottom: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <span style={{ fontSize: '1.05rem' }}>Signed in as <strong>{user.username}</strong></span>
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
-            </div>
-            <TasksList />
-          </div>
-
-          <div className="card chatbot" style={{ marginTop: 24 }}>
-            <h2 style={{ fontWeight: 600, fontSize: '1.3rem', marginBottom: 12 }}>Chatbot</h2>
-            <Chatbot />
-          </div>
-        </>
-      )}
+      </main>
     </div>
   );
 }

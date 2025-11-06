@@ -9,6 +9,9 @@
 
 import React, { useState } from 'react';
 import { auth } from '../services/apiService';
+import Input from '../ui/Input';
+import Button from '../ui/Button';
+import './AuthForms.css';
 
 export default function RegisterForm({ onRegisterSuccess }) {
   // Local state for the form fields and UI feedback
@@ -46,67 +49,93 @@ export default function RegisterForm({ onRegisterSuccess }) {
   }
 
   return (
-    <form className="register-form" onSubmit={handleSubmit} autoComplete="on">
+    <div className="auth-form">
       {/* Error banner */}
-      {error && <div className="error">{error}</div>}
+      {error && (
+        <div className="auth-form__error" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {error}
+        </div>
+      )}
 
-      <div className="form-group">
-        <label htmlFor="username">Username</label>
-        <input
+      <form onSubmit={handleSubmit} className="auth-form__form" autoComplete="on">
+        <Input
           id="username"
           type="text"
+          label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
-          placeholder="Enter your username"
+          placeholder="Choose a username"
           required
+          leftIcon={
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          }
         />
-      </div>
 
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
-        <input
+        <Input
           id="email"
           type="email"
+          label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
           placeholder="Enter your email"
           required
+          leftIcon={
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          }
         />
-      </div>
 
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <input
+        <Input
           id="password"
           type="password"
+          label="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="new-password"
-          placeholder="Enter your password"
+          placeholder="Create a password"
           required
+          leftIcon={
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          }
         />
-      </div>
 
-      <div className="form-group">
-        <label htmlFor="confirm">Confirm Password</label>
-        <input
+        <Input
           id="confirm"
           type="password"
+          label="Confirm Password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           autoComplete="new-password"
           placeholder="Confirm your password"
           required
+          error={confirm && password !== confirm ? 'Passwords do not match' : ''}
+          leftIcon={
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          }
         />
-      </div>
 
-      <div className="form-actions">
-        <button className="btn" type="submit" disabled={loading}>
-          {loading ? 'Registering...' : 'Register'}
-        </button>
-      </div>
-    </form>
+        <Button type="submit" variant="primary" fullWidth loading={loading}>
+          {loading ? 'Creating account...' : 'Create Account'}
+        </Button>
+      </form>
+    </div>
   );
 }

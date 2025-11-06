@@ -1,0 +1,160 @@
+/**
+ * Input Component Styles
+ */
+
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+/* ============================================
+   LABEL
+   ============================================ */
+
+.input__label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.input__required {
+  color: var(--color-error-600);
+  margin-left: var(--space-1);
+}
+
+/* ============================================
+   INPUT WRAPPER
+   ============================================ */
+
+.input__wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================
+   INPUT FIELD
+   ============================================ */
+
+.input__field {
+  width: 100%;
+  height: 44px;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--bg-surface);
+  border: var(--border-width-1) solid var(--border-default);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  transition: border-color var(--duration-fast) var(--ease-in-out),
+              box-shadow var(--duration-fast) var(--ease-in-out),
+              background-color var(--duration-fast) var(--ease-in-out);
+  outline: none;
+}
+
+.input__field::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input__field:hover:not(:disabled):not(.input__field--error) {
+  border-color: var(--border-hover);
+}
+
+.input__field:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input__field:disabled {
+  background-color: var(--bg-surface-secondary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* With icons */
+.input__field--with-left-icon {
+  padding-left: var(--space-10);
+}
+
+.input__field--with-right-icon {
+  padding-right: var(--space-10);
+}
+
+/* Error state */
+.input__field--error {
+  border-color: var(--border-error);
+}
+
+.input__field--error:focus {
+  border-color: var(--border-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================
+   ICONS
+   ============================================ */
+
+.input__icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.input__icon--left {
+  left: var(--space-3);
+}
+
+.input__icon--right {
+  right: var(--space-3);
+}
+
+.input__field:focus ~ .input__icon,
+.input__field:not(:placeholder-shown) ~ .input__icon {
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   HELPER TEXT & ERROR
+   ============================================ */
+
+.input__helper {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.input__error {
+  font-size: var(--text-sm);
+  color: var(--color-error-600);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.input__error::before {
+  content: '⚠';
+  font-size: var(--text-base);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .input__field {
+    height: 48px;
+    font-size: var(--text-base);
+  }
+}
