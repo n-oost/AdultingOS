@@ -196,6 +196,69 @@ export const tags = {
   }),
 };
 
+// User profile endpoints
+export const profile = {
+  /**
+   * Get current user's profile
+   */
+  get: () => request('/api/profile/me/'),
+
+  /**
+   * Update current user's profile
+   */
+  update: (profileData) => request('/api/profile/me/', {
+    method: 'PATCH',
+    body: JSON.stringify(profileData),
+  }),
+};
+
+// Assistant/Chat endpoints (FastAPI)
+// Note: These endpoints run on a separate FastAPI server (default: port 8001)
+const ASSISTANT_BASE = process.env.REACT_APP_ASSISTANT_URL || 'http://127.0.0.1:8001';
+
+export const assistant = {
+  /**
+   * Send a message to the AI assistant
+   * The assistant will automatically forward authentication to Django if needed
+   */
+  chat: async (message) => {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add authentication token if available
+    if (authToken) {
+      headers['Authorization'] = `Token ${authToken}`;
+    }
+
+    try {
+      const response = await fetch(`${ASSISTANT_BASE}/chat`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ message }),
+      });
+
+      if (!response.ok) {
+        let message = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const maybeJson = await response.json();
+          if (maybeJson && (maybeJson.detail || maybeJson.error)) {
+            message = maybeJson.detail || maybeJson.error;
+          }
+        } catch (_) {
+          // Response was not JSON; keep fallback message
+        }
+        throw new Error(message);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Assistant API request failed:', error);
+      throw error;
+    }
+  },
+};
+
 // Optional: named export for consumers who prefer a single object import
 // Using a named constant avoids the ESLint warning about anonymous default exports.
 export const api = { auth, tasks, tags, setAuthToken, clearAuthToken };
