@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import Card, { CardHeader, CardBody } from '../ui/Card';
+import Card, { CardBody } from '../ui/Card';
 import Button from '../ui/Button';
 import { tasks } from '../services/apiService';
 import './Dashboard.css';
