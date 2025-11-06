@@ -20,6 +20,7 @@ export default function Dashboard({ user }) {
   });
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadDashboardData();
@@ -28,6 +29,7 @@ export default function Dashboard({ user }) {
   async function loadDashboardData() {
     try {
       setLoading(true);
+      setError('');
       const allTasks = await tasks.list();
       
       // Calculate stats
@@ -44,8 +46,9 @@ export default function Dashboard({ user }) {
       
       // Get recent tasks (top 5)
       setRecentTasks(allTasks.slice(0, 5));
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err);
+      setError(err?.message || 'Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -62,6 +65,18 @@ export default function Dashboard({ user }) {
           Here's what's happening with your tasks today.
         </p>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="dashboard__error" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {error}
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="dashboard__stats">

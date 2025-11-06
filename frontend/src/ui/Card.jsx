@@ -27,29 +27,31 @@ export default function Card({
   as: Component = 'div',
   ...props
 }) {
+  // Only make clickable if onClick is provided
+  const isClickable = clickable && onClick;
+  
   const classes = [
     'card',
     `card--${variant}`,
-    (hoverable || clickable || onClick) && 'card--hoverable',
-    clickable && 'card--clickable',
+    (hoverable || onClick) && 'card--hoverable',
+    isClickable && 'card--clickable',
     className
   ].filter(Boolean).join(' ');
 
-  const handleClick = onClick || (clickable ? () => {} : undefined);
-  const handleKeyDown = clickable ? (e) => {
+  const handleKeyDown = isClickable ? (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick?.(e);
+      onClick?.(e);
     }
   } : undefined;
 
   return (
     <Component
       className={classes}
-      onClick={handleClick}
+      onClick={onClick}
       onKeyDown={handleKeyDown}
-      tabIndex={clickable ? 0 : undefined}
-      role={clickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      role={isClickable ? 'button' : undefined}
       {...props}
     >
       {children}
