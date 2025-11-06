@@ -56,13 +56,9 @@ except Exception as e:
     # Keep API usable even if assistant optional deps missing
     pass
 
-try:
-    from src.tasks import router as tasks_router
-    app.include_router(tasks_router)
-    print("✓ Tasks router loaded")
-except Exception as e:
-    print(f"✗ Tasks router failed: {e}")
-    pass
+# Note: src.tasks router is currently not implemented
+# The task system is handled through Django REST API at /api/tasks/
+# If you need FastAPI task endpoints, create a router in src/tasks.py
 
 # --- API Endpoints ---
 
