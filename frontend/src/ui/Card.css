@@ -1,0 +1,106 @@
+/**
+ * Card Component Styles
+ */
+
+.card {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: box-shadow var(--duration-normal) var(--ease-in-out),
+              transform var(--duration-normal) var(--ease-in-out);
+}
+
+/* ============================================
+   VARIANTS
+   ============================================ */
+
+.card--default {
+  box-shadow: var(--shadow-sm);
+  border: var(--border-width-1) solid var(--border-default);
+}
+
+.card--elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card--outlined {
+  border: var(--border-width-2) solid var(--border-default);
+}
+
+.card--flat {
+  border: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   INTERACTIVE STATES
+   ============================================ */
+
+.card--hoverable:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card--clickable {
+  cursor: pointer;
+}
+
+.card--clickable:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.card--clickable:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   CARD SECTIONS
+   ============================================ */
+
+.card__header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: var(--border-width-1) solid var(--border-default);
+}
+
+.card__body {
+  padding: var(--space-6);
+}
+
+.card__footer {
+  padding: var(--space-5) var(--space-6);
+  border-top: var(--border-width-1) solid var(--border-default);
+  background-color: var(--bg-surface-secondary);
+}
+
+/* Compact variants */
+.card__header--compact {
+  padding: var(--space-4);
+}
+
+.card__body--compact {
+  padding: var(--space-4);
+}
+
+.card__footer--compact {
+  padding: var(--space-4);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .card__header {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .card__body {
+    padding: var(--space-4);
+  }
+
+  .card__footer {
+    padding: var(--space-4) var(--space-4);
+  }
+}
