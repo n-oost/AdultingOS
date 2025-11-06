@@ -1,0 +1,81 @@
+PROJECT PROPOSAL: ADULTINGOS
+Document Version: 3.1
+Date: September 24, 2025
+Prepared For: Dr. Magdalene R for class INFO6156 Capstone Project
+Prepared By: Noah Oosting
+Podcast-Style Audio Overview of Proposal: 
+
+?? Project Goals & Objectives
+Our primary goal is to empower young adults by simplifying the discovery and application process for financial benefits, leveraging a data-driven mobile assistant to reduce administrative complexity and anxiety.
+To achieve this, we will focus on the following SMART objectives:
+? Develop Core AI Prototypes: By the end of November 2025, develop functional proofs-of-concept for the Document Intelligence Hub (OCR/NER), the Proactive Eligibility Forecaster, and the Conversational Guidance Navigator.
+? Integrate Features into a Single Application: By early December 2025, integrate all three AI prototypes into a single, cohesive React Native mobile application that includes secure user login and a basic user interface to demonstrate the core functionality.
+? Validate the Core Concept: By the project deadline in December 2025, conduct and document user acceptance testing (UAT) with a small group of 3-5 users to validate the core concepts and gather feedback on the prototype's potential.
+
+??? Project Scope
+To ensure a focused and timely delivery, the project scope is clearly defined below.
+? In-Scope
+? Secure user account creation, authentication, and profile management.
+? A proof-of-concept document upload feature with a functional OCR/NER pipeline.
+? A Python-based backend service with a machine learning model to match user profiles to a database of benefits.
+? A prototype ML model to forecast the likelihood of application approval.
+? A prototype AI chatbot for user guidance.
+? A RESTful API to facilitate communication between the mobile client and the backend.
+? A cross-platform mobile application prototype built with React Native to demonstrate the core features.
+? Out-of-Scope
+? A web-based desktop application; the project is mobile-first.
+? Direct integration with user bank accounts for financial analysis.
+? Automated submission of applications on the user's behalf.
+? A fully-featured, dynamic financial goal-planning system.
+? Production-level model accuracy, extensive training, or large-scale LLM implementation.
+
+? Planned Software Features
+To create a lasting competitive advantage, AdultingOS will incorporate a suite of interconnected, AI-powered features designed to simplify the user's administrative life.
+1.1 The Document Intelligence Hub
+Users upload documents like W-2s, and the app's AI automatically reads them to find key information. This info is then used to auto-fill application forms, saving time and reducing typos.
+1.2 The Proactive Eligibility Forecaster
+An AI model analyzes a user's profile to predict their chances of being approved for different benefits. This helps users focus their time and energy on the applications they are most likely to get.
+1.3 The Conversational Guidance Navigator
+A built-in chatbot that acts as a personal assistant. Users can ask it questions about confusing forms or terms (like "What is AGI?"), and it will provide simple, clear answers in real-time.
+1.4 The "Benefit-to-Goal" Financial Planner
+This feature connects benefits to personal financial goals. It shows users how claiming a specific tax credit or grant helps them get closer to saving for something important, like an emergency fund.
+Feature Prioritization Overview
+The following matrix provides a strategic overview to guide the development process.
+FeatureTechnical ComplexityUser Value ImpactData RequirementsMonetization PotentialDocument Intelligence HubMediumHighLow (User-provided docs)High (Core Premium Feature)Proactive Eligibility ForecasterHighVery HighHigh (Labeled historical data)Very High (Key Premium Differentiator)Conversational Guidance NavigatorMediumHighMedium (Scraped FAQs, guides)High (Premium Support Feature)"Benefit-to-Goal" PlannerLow-MediumMedium-HighLow (User-defined goals)Medium (Enhances Premium Stickiness)?? Technical Approach & Architecture
+The project will be built on a modern, scalable, and secure technology stack.
+Technology Stack:
+? Frontend: React Native (for cross-platform iOS and Android development)
+? Backend: Python (Django) with Django REST Framework
+? Database: PostgreSQL (for structured user and benefits data)
+? AI/ML: scikit-learn, pandas, Tesseract (OCR), spaCy (NER)
+? Chatbot: LLM APIs (e.g., Gemini) or Self-Hosted Frameworks (e.g., Botpress)
+? Cloud/Hosting: AWS (e.g., EC2 for hosting, S3 for documents, RDS for database)
+
+Data Sources & Processing:
+? Primary Data Sources: The core information for benefits, grants, and tax credits will be sourced from official Canadian government websites, including the Canada Revenue Agency (CRA), Employment and Social Development Canada (ESDC), and provincial government portals (e.g., Ontario.ca).
+? Data Acquisition: Initial data will be gathered using web scraping techniques (e.g., with Python libraries like BeautifulSoup and Scrapy) to extract relevant text and eligibility rules.
+? Data Processing & Structuring: Once acquired, the raw text data will be cleaned and structured using the pandas library. Key eligibility criteria (e.g., income thresholds, age limits, residency status) will be extracted and converted into a standardized format. This structured data will populate the PostgreSQL database, forming the knowledge base for the recommendation engine.
+Detailed System Architecture:
+CLICK HERE FOR LINK TO HI RES IMAGE OR SCAN QR CODE
+
+?? Project Plan & Timeline
+The project will be executed in an agile, sprint-based format to ensure completion by the December 2025 deadline.
+PhaseKey Milestones & DeliverablesEstimated TimelinePhase 1: ?? Foundation & Core AIFinalized Requirements, UX/UI Wireframes, Core User Auth API, PoC for Document Hub.Sept - Oct 2025Phase 2: ?? Parallel AI DevelopmentDevelop PoC for Forecaster Model (with simulated data), Develop PoC for Chatbot.November 2025Phase 3: ?? Integration & FinalizationIntegrate all PoCs into React Native App, UAT with 3-5 users, Bug Fixing, Final Docs.Early Dec 2025?? Success Metrics & KPIs
+Success for this capstone project will be measured against the successful delivery and demonstration of the prototype.
+? Project Completion: A functional prototype demonstrating all "In-Scope" features is delivered by the deadline.
+? Feature Functionality: Each core AI feature (Document Hub, Forecaster, Chatbot) is successfully demonstrated during the final presentation.
+? UAT Completion: User acceptance testing is successfully conducted and feedback is documented.
+? System Integration: All backend AI services are successfully connected to and displayed within the mobile application prototype.
+?? Potential Impact
+By simplifying complex processes, AdultingOS can provide tangible benefits for the average Canadian.
+? Improved Finances: Help users find and claim missed benefits or tax credits, putting more money in their pockets.
+? Lower Stress: Reduce the anxiety of dealing with bureaucracy by automating paperwork and providing clear guidance.
+? Time Savings: Save users hours of searching and filling out forms, freeing up their time for work, school, or life.
+? Greater Empowerment: Make complex systems easier to understand, giving users more control and improving their financial knowledge.
+?? Potential Monetization Strategies
+To ensure long-term viability beyond the initial project, AdultingOS would pursue a phased monetization strategy focused on delivering direct value to users.
+? Freemium Model: The primary strategy is to offer a free "Core" version of the app with essential features to attract a large user base. A paid "Plus" subscription would then unlock the full suite of advanced AI features (Document Intelligence, Eligibility Forecaster, AI Chatbot) for a recurring fee.
+? B2B/Institutional Partnerships: A secondary, scalable revenue stream would involve licensing the platform to organizations like universities, credit unions, and non-profits. These partners could offer a co-branded version of AdultingOS to their students, members, or clients as a value-added service.
+? Anonymized Data Insights (Long-Term): A distant, future possibility is to provide high-level, fully anonymized statistical reports to government or academic institutions. This model carries significant trust and privacy risks and would only be considered with explicit user opt-in and advanced privacy-preserving technologies.
+?? Conclusion
+This proposal outlines the development of AdultingOS, an AI-powered mobile application designed to help young Canadian adults navigate and access financial benefits. The project's scope is to deliver a functional prototype by December 2025, featuring a Document Intelligence Hub, an Eligibility Forecaster, and a Conversational Navigator, all built on a modern tech stack including React Native and Python. Success will be measured by the successful integration and demonstration of these core features through user acceptance testing. By simplifying complex administrative processes, AdultingOS aims to provide significant financial and personal empowerment, with a clear path to long-term sustainability through a freemium subscription model and future B2B partnerships.

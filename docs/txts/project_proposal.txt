@@ -1,0 +1,8 @@
+Project Proposal
+Noah Oosting
+Project Name
+AdultingOS
+Product Description:
+This project proposes the development of an intelligent software assistant designed to mitigate the administrative burden placed on young adults (ages 18-35). By leveraging artificial intelligence, the system will identify and streamline applications for relevant government benefits, educational funding, and tax credits. The primary objective is to empower users by simplifying complex bureaucratic processes and ensuring they receive all applicable financial entitlements.
+Product Purpose:
+To provide a personalized digital co-pilot for navigating the administrative complexities of modern life. The application will leverage AI to proactively identify eligible benefits, simplify tax information, and demystify legal processes for the user. The goal is to replace the anxiety and confusion of "adulting" with a clear, actionable path toward financial and administrative well-being.

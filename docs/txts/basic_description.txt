@@ -1,0 +1,56 @@
+Project Concept: "AdultingOS"
+A personalized AI assistant that helps young adults navigate life's paperwork and maximize their financial well-being by discovering and applying for relevant benefits, grants, and tax credits.
+
+Core AI-Powered Features
+Your project can be built around a few key AI components that directly address the problems you've identified.
+
+Conversational AI & Onboarding:
+
+How it works: Instead of a boring, long sign-up form, a chatbot interface guides the user through creating their profile. It can ask questions conversationally, like "Are you currently a student?", "Do you rent or own your home?", "Have you had a job in the last year?".
+AI Technology: Natural Language Processing (NLP) and Dialogue Management. You can build this using frameworks like Rasa, or leverage pre-built platforms from cloud providers.
+Personalized Recommendation Engine:
+
+How it works: This is the core of your "benefit finding" feature. Based on the user's profile (age, location, income, student status, family size, etc.), the system recommends a prioritized list of opportunities.
+Examples:
+A student in a low-income bracket could be matched with the Pell Grant, FAFSA deadlines, and local scholarships.
+A recent graduate might be recommended the American Opportunity Tax Credit or student loan interest deduction.
+Someone who just lost their job would be guided towards unemployment insurance applications for their specific state.
+AI Technology: This is a classic machine learning problem. You can start with a simple rule-based system and evolve it into a more complex model (like a collaborative filtering or classification model) that learns which recommendations are most successful.
+Document Analysis & Form Assistance (The "Paperwork" part):
+
+How it works: Users can upload or scan documents (e.g., a T4, W-2, or a school enrollment letter). The AI extracts key information and uses it to pre-fill applications or identify missing information.
+Example: A user uploads their W-2. The AI extracts their employer's info, their income, and taxes paid, and can use that data to help them with their tax return or other financial applications.
+AI Technology: Optical Character Recognition (OCR) combined with Named Entity Recognition (NER). Services like Google Cloud Vision AI, Amazon Textract, or open-source libraries like Tesseract can handle this.
+Phased Project Plan (For Your Capstone Timeline)
+A project this ambitious needs to be broken down. Here’s a possible roadmap to have a "nearly complete" slice of the product by December.
+
+Phase 1: The MVP (Minimum Viable Product) - By late October
+
+Focus: Federal Student Aid & Tax Credits for Students. This is a narrow, high-value starting point for your target audience.
+Features:
+AI Chatbot Onboarding: Create the conversational profile builder.
+Knowledge Base: Manually build a database of the top 10-15 most common federal benefits and tax credits for students (Pell Grant, FAFSA, American Opportunity Credit, etc.).
+Rule-Based Recommender: Create a simple engine that matches a user's profile to the items in your knowledge base.
+Actionable Checklist: The output for the user should be a simple, clear checklist. E.g., "Recommended for you: [1] Apply for FAFSA (Deadline: ...), [2] Claim American Opportunity Tax Credit on your next tax return."
+Phase 2: The "Wow" Factor - By December
+
+Focus: Adding one advanced AI feature and expanding the content.
+Features:
+Implement Document Analysis: Choose ONE key document to start with. A W-2 is a great choice. Allow a user to upload it, and have the AI extract the income and show it back to them. This demonstrates the powerful OCR/NER capability.
+Expand the Knowledge Base: Double the number of benefits in your database, perhaps including a few specific to your state or province to show scalability.
+UI/UX Polish: Build a clean, simple web interface for the chatbot and the recommendation checklist.
+Monetization Strategy: Freemium Model
+This is the most natural fit for your application.
+
+Free Tier:
+
+Access to the recommendation engine for major federal programs.
+Deadline reminders for up to 3 applications.
+Basic conversational AI support.
+Premium Tier ($5/month or $50/year):
+
+Recommendations for state/provincial and local benefits (a much larger, more complex dataset).
+Full document analysis and form pre-filling.
+Unlimited deadline tracking.
+"What-if" scenarios: "What if I earned $5,000 more? How would my benefits change?"
+This project is ambitious, but by narrowing the scope for your capstone, you can absolutely create a polished and impressive piece of software that solves a real problem. Good luck

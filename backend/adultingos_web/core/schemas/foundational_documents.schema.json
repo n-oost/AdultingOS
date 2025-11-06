@@ -1,0 +1,546 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://adultingos.app/schemas/foundational-documents.json",
+  "title": "Foundational Identity & Education Module Schema",
+  "description": "JSON Schema for Canadian foundational identity documents and education funding applications (Ontario focus)",
+  "version": "1.0.0",
+  
+  "definitions": {
+    "legalName": {
+      "type": "object",
+      "required": ["firstName", "lastName"],
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "middleName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "lastName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      }
+    },
+    
+    "personalInformation": {
+      "type": "object",
+      "required": ["legalName", "dateOfBirth", "placeOfBirth", "sex"],
+      "properties": {
+        "legalName": {
+          "$ref": "#/definitions/legalName"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date"
+        },
+        "placeOfBirth": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "sex": {
+          "type": "string",
+          "enum": ["M", "F", "X"]
+        },
+        "formerNames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/legalName"
+          }
+        },
+        "height": {
+          "type": "number",
+          "description": "Height in centimeters",
+          "minimum": 0
+        },
+        "gender": {
+          "type": "string",
+          "maxLength": 50
+        }
+      }
+    },
+    
+    "address": {
+      "type": "object",
+      "required": ["streetAddress", "city", "province", "postalCode"],
+      "properties": {
+        "streetAddress": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "apartmentUnit": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "province": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "postalCode": {
+          "type": "string",
+          "pattern": "^[A-Z]\\d[A-Z] ?\\d[A-Z]\\d$",
+          "description": "Canadian postal code format: A1A 1A1 or A1A1A1"
+        },
+        "country": {
+          "type": "string",
+          "maxLength": 100,
+          "default": "Canada"
+        }
+      }
+    },
+    
+    "contactInformation": {
+      "type": "object",
+      "required": ["primaryPhoneNumber", "emailAddress"],
+      "properties": {
+        "primaryPhoneNumber": {
+          "type": "string",
+          "pattern": "^\\+?1?[\\s.-]?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+          "description": "North American phone number format"
+        },
+        "alternatePhoneNumber": {
+          "type": "string",
+          "pattern": "^\\+?1?[\\s.-]?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+        },
+        "emailAddress": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    
+    "supportingDocument": {
+      "type": "object",
+      "required": ["documentType", "issuingAuthority", "documentNumber", "issueDate", "functionalRole"],
+      "properties": {
+        "documentType": {
+          "type": "string",
+          "enum": [
+            "PASSPORT",
+            "DRIVERS_LICENSE",
+            "BIRTH_CERT",
+            "CITIZENSHIP",
+            "PR_CARD",
+            "HEALTH_CARD",
+            "SIN_CARD",
+            "BANK_STATEMENT",
+            "UTILITY_BILL"
+          ]
+        },
+        "issuingAuthority": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "documentNumber": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "issueDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "functionalRole": {
+          "type": "string",
+          "enum": [
+            "IDENTITY",
+            "ADDRESS",
+            "STATUS",
+            "INCOME",
+            "EDUCATION"
+          ]
+        }
+      }
+    },
+    
+    "applicationStatus": {
+      "type": "string",
+      "enum": ["DRAFT", "REVIEW", "SUBMITTED", "APPROVED", "REJECTED", "CANCELLED"]
+    }
+  },
+  
+  "type": "object",
+  "properties": {
+    "foundationalDocumentsSnapshot": {
+      "type": "object",
+      "description": "Canonical identity information for the user, reusable across multiple applications",
+      "required": ["personalInformation", "currentAddress", "contactInformation"],
+      "properties": {
+        "personalInformation": {
+          "$ref": "#/definitions/personalInformation"
+        },
+        "currentAddress": {
+          "$ref": "#/definitions/address"
+        },
+        "contactInformation": {
+          "$ref": "#/definitions/contactInformation"
+        },
+        "supportingDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/supportingDocument"
+          }
+        },
+        "lastVerified": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    
+    "sinApplication": {
+      "type": "object",
+      "description": "Social Insurance Number application (federal - ESDC/Service Canada)",
+      "required": [
+        "submissionMethod",
+        "applicationType",
+        "applicantInformation",
+        "contactInformation",
+        "address"
+      ],
+      "properties": {
+        "submissionMethod": {
+          "type": "string",
+          "enum": ["ONLINE", "MAIL", "IN_PERSON"]
+        },
+        "applicationType": {
+          "type": "string",
+          "enum": ["NEW", "REPLACEMENT", "UPDATE", "CONFIRMATION"]
+        },
+        "applicantInformation": {
+          "$ref": "#/definitions/personalInformation"
+        },
+        "contactInformation": {
+          "$ref": "#/definitions/contactInformation"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "submittedDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/supportingDocument"
+          }
+        },
+        "sinNumber": {
+          "type": "string",
+          "pattern": "^\\d{9}$",
+          "description": "9-digit SIN (stored encrypted)"
+        },
+        "status": {
+          "$ref": "#/definitions/applicationStatus"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "if": {
+        "properties": {
+          "submissionMethod": {
+            "const": "ONLINE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "submittedDocuments": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "functionalRole": {
+                  "const": "ADDRESS"
+                }
+              }
+            }
+          }
+        },
+        "description": "Online applications require proof of address"
+      }
+    },
+    
+    "passportApplication": {
+      "type": "object",
+      "description": "Passport application (federal - IRCC Passport Program)",
+      "required": [
+        "applicantInformation",
+        "contactInformation",
+        "addressesLastTwoYears",
+        "guarantor",
+        "references"
+      ],
+      "properties": {
+        "applicantInformation": {
+          "$ref": "#/definitions/personalInformation"
+        },
+        "contactInformation": {
+          "$ref": "#/definitions/contactInformation"
+        },
+        "addressesLastTwoYears": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/address"
+          },
+          "minItems": 1
+        },
+        "occupationHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "employer": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        },
+        "guarantor": {
+          "type": "object",
+          "required": ["fullName", "canadianPassportNumber", "yearsKnown"],
+          "properties": {
+            "fullName": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "canadianPassportNumber": {
+              "type": "string",
+              "pattern": "^\\d{8}$",
+              "description": "8-digit Canadian passport number (stored encrypted)"
+            },
+            "yearsKnown": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "Must have known applicant for at least 2 years"
+            }
+          }
+        },
+        "references": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["fullName", "relationship", "contactInformation", "isFamily"],
+            "properties": {
+              "fullName": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "relationship": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "contactInformation": {
+                "$ref": "#/definitions/contactInformation"
+              },
+              "isFamily": {
+                "type": "boolean",
+                "const": false,
+                "description": "References cannot be family members"
+              }
+            }
+          }
+        },
+        "submittedDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/supportingDocument"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/applicationStatus"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    
+    "ontarioProvincialIdApplication": {
+      "type": "object",
+      "description": "Ontario Provincial ID application (provincial - MTO/ServiceOntario)",
+      "required": ["applicationType", "applicantInformation", "address"],
+      "properties": {
+        "applicationType": {
+          "type": "string",
+          "enum": ["DRIVER_LICENSE", "PHOTO_CARD"]
+        },
+        "applicantInformation": {
+          "$ref": "#/definitions/personalInformation"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "isSurrenderingExistingId": {
+          "type": "boolean",
+          "default": false
+        },
+        "medicalInformation": {
+          "type": "object",
+          "description": "Required for driver's license applications"
+        },
+        "submittedDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/supportingDocument"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/applicationStatus"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "if": {
+        "properties": {
+          "applicationType": {
+            "const": "DRIVER_LICENSE"
+          }
+        }
+      },
+      "then": {
+        "required": ["medicalInformation"],
+        "description": "Medical information required for driver's license"
+      }
+    },
+    
+    "osapApplication": {
+      "type": "object",
+      "description": "Ontario Student Assistance Program application (provincial - MCU)",
+      "required": [
+        "studentProfile",
+        "dependencyInformation",
+        "academicInformation",
+        "studentFinancials"
+      ],
+      "properties": {
+        "studentProfile": {
+          "$ref": "#/definitions/personalInformation"
+        },
+        "dependencyInformation": {
+          "type": "object",
+          "required": ["status", "maritalStatus"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["DEPENDENT", "INDEPENDENT"]
+            },
+            "maritalStatus": {
+              "type": "string",
+              "enum": ["SINGLE", "MARRIED", "COMMON_LAW", "SEPARATED", "DIVORCED", "WIDOWED"]
+            }
+          }
+        },
+        "academicInformation": {
+          "type": "object",
+          "required": ["institution", "program", "studyPeriod"],
+          "properties": {
+            "institution": {
+              "type": "string"
+            },
+            "program": {
+              "type": "string"
+            },
+            "studyPeriod": {
+              "type": "object",
+              "required": ["startDate", "endDate"],
+              "properties": {
+                "startDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "endDate": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            }
+          }
+        },
+        "studentFinancials": {
+          "type": "object",
+          "description": "Student's financial information"
+        },
+        "parentalFinancials": {
+          "type": "object",
+          "description": "Required if dependency status is DEPENDENT"
+        },
+        "spousalFinancials": {
+          "type": "object",
+          "description": "Required if marital status is MARRIED or COMMON_LAW"
+        },
+        "status": {
+          "$ref": "#/definitions/applicationStatus"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "dependencyInformation": {
+                "properties": {
+                  "status": {
+                    "const": "DEPENDENT"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["parentalFinancials"],
+            "description": "Parental financials required for dependent students"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "dependencyInformation": {
+                "properties": {
+                  "maritalStatus": {
+                    "enum": ["MARRIED", "COMMON_LAW"]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["spousalFinancials"],
+            "description": "Spousal financials required for married/common-law students"
+          }
+        }
+      ]
+    }
+  }
+}
