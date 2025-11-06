@@ -12,21 +12,35 @@
 const API_BASE = 'http://127.0.0.1:8000'; // Django REST API
 const ASSISTANT_BASE = 'http://127.0.0.1:8001'; // FastAPI Assistant
 
-// In-memory auth token storage
+// Auth token storage
+// Note: For React Native, you should use AsyncStorage for persistence
+// This in-memory implementation will reset on app restart
+// To add persistence: npm install @react-native-async-storage/async-storage
 let authToken = null;
 
 /**
- * Set the authentication token for subsequent API requests
+ * Set the authentication token for subsequent API requests.
+ * For production, consider using AsyncStorage to persist the token.
  */
 export const setAuthToken = (token) => {
   authToken = token;
+  // TODO: Add AsyncStorage.setItem('@adultingos_token', token) for persistence
 };
 
 /**
- * Clear the authentication token
+ * Clear the authentication token (e.g., on logout).
  */
 export const clearAuthToken = () => {
   authToken = null;
+  // TODO: Add AsyncStorage.removeItem('@adultingos_token') for persistence
+};
+
+/**
+ * Get the current authentication token.
+ * Returns null if no token is set.
+ */
+export const getAuthToken = () => {
+  return authToken;
 };
 
 /**

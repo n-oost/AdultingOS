@@ -13,29 +13,41 @@
 //   Example: REACT_APP_API_URL=http://127.0.0.1:8000
 const API_BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 
-// In-memory auth token storage
-// NOTE: This resets on page refresh. Persist to localStorage if you need durability.
-let authToken = null;
+// Auth token storage with localStorage persistence
+const TOKEN_KEY = 'adultingos_auth_token';
+
+// Initialize token from localStorage on module load
+let authToken = localStorage.getItem(TOKEN_KEY);
 
 /**
- * Set the authentication token for subsequent requests
- */
-/**
  * Set the authentication token for subsequent API requests.
+ * Persists to localStorage for durability across page refreshes.
  * Call this after successful login/registration.
  */
 export const setAuthToken = (token) => {
   authToken = token;
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+  }
 };
 
 /**
- * Clear the authentication token (for logout)
- */
-/**
  * Clear the authentication token (e.g., on logout).
+ * Removes from both memory and localStorage.
  */
 export const clearAuthToken = () => {
   authToken = null;
+  localStorage.removeItem(TOKEN_KEY);
+};
+
+/**
+ * Get the current authentication token.
+ * Returns null if no token is set.
+ */
+export const getAuthToken = () => {
+  return authToken;
 };
 
 /**
