@@ -54,9 +54,9 @@ chat_headers = {
     "Authorization": f"Bearer {token}",
     "Content-Type": "application/json"
 }
-# The endpoint expects a body with a "text" field
+# The endpoint expects a body with a "message" field
 chat_data = {
-    "text": "Hello, this is a test message."
+    "message": "Hello, this is a test message."
 }
 
 try:
